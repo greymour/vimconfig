@@ -55,6 +55,21 @@ lsp.on_attach(function(client, bufnr)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end)
 
+require('lspconfig').pyright.setup({
+  settings = {
+    python = {
+      pythonPath = '/usr/local/bin/python3.11',
+      analysis = {
+        typeCheckingMode = "strict",
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "workspace",
+        stubPath = vim.fn.stdpath('data') .. '/stubs'
+      }
+    }
+  }
+})
+
 lsp.setup()
 
 vim.diagnostic.config({
