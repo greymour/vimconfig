@@ -67,7 +67,7 @@ return require('packer').startup(function(use)
   use 'mattn/emmet-vim'
   -- this one doesn't really work :(((
   use 'styled-components/vim-styled-components'
-  use 'akinsho/bufferline.nvim'
+  use { 'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons' }
   -- shows git diff indicators in editor
   use 'lewis6991/gitsigns.nvim'
   -- autocompletion and tag renaming for JSX
