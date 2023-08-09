@@ -1,4 +1,2 @@
 .DS_STORE
-*/**/packer-compiled.lua
-# this folder contains Copilot stuff, don't want on non-work computers
-pack
+packer-compiled.lua
