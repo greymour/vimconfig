@@ -63,12 +63,10 @@ return require('packer').startup(function(use)
       { 'rafamadriz/friendly-snippets' },
     }
   }
-  -- emmet autocompletion for vim, but idk how this works :DDDD
+
   use 'mattn/emmet-vim'
   -- this one doesn't really work :(((
   use 'styled-components/vim-styled-components'
-  -- required for fancy tab icons
-  use 'nvim-tree/nvim-web-devicons'
   use { 'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons' }
   -- shows git diff indicators in editor
   use 'lewis6991/gitsigns.nvim'
