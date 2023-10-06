@@ -12,6 +12,12 @@ vim.opt.smartindent = true
 
 vim.opt.wrap = false
 
+local autocmd = vim.api.nvim_create_autocmd
+autocmd("BufEnter", {
+  pattern = { "*.md", "*.txt" },
+  command = "setlocal wrap linebreak"
+})
+
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
@@ -29,4 +35,3 @@ vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "120"
-
