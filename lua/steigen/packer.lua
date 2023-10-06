@@ -75,10 +75,10 @@ return require('packer').startup(function(use)
   -- autocompletion and tag renaming for JSX
   use 'windwp/nvim-ts-autotag'
   -- autocompletion for paired characters (eg. {}, (), '', etc)
-  use {
-    "windwp/nvim-autopairs",
-    config = function() require("nvim-autopairs").setup {} end
-  }
+  -- use {
+  --   "windwp/nvim-autopairs",
+  --   config = function() require("nvim-autopairs").setup {} end
+  -- }
 
   use 'github/copilot.vim'
 end)
