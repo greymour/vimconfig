@@ -1,4 +1,3 @@
-
 vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 -- these two make it so that when highlighting lines, by holding shift + using
@@ -18,10 +17,10 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- next greatest remap ever : asbjornHaland
-vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
-vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
+vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
 -- This is going to get me cancelled
 vim.keymap.set("i", "<C-c>", "<Esc>")
@@ -41,7 +40,33 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.dotfiles/nvim/.config/nvim/lua/theprimeagen/packer.lua<CR>");
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
-vim.keymap.set("n", "<leader><leader>", function()
-    vim.cmd("so")
+local log_table = {
+  javascriptreact = { "console.log('%s: ', %s);", 3 },
+  typescriptreact = { "console.log('%s: ', %s);", 3 },
+  typescript = { "console.log('%s: ', %s);", 3 },
+  javascript = { "console.log('%s: ', %s);", 3 },
+  lua = { "print('%s: ', %s)", 3 },
+  go = { "fmt.Printf(\"%s: %%v\", %s)", 1 },
+  rust = { "println!(\"%s: {:?}\", %s);", 2 },
+}
+
+vim.keymap.set("n", "<leader>ll", function()
+  local type = vim.bo.filetype
+  print(vim.inspect(type))
+  if log_table[type] then
+    local line = vim.api.nvim_win_get_cursor(0)[1]
+    local text = vim.api.nvim_get_current_line()
+    local new_text = string.format(log_table[type][1], line, text)
+    vim.api.nvim_set_current_line(new_text)
+    vim.api.nvim_win_set_cursor(0, { line, #new_text - log_table[type][2] })
+    vim.cmd("startinsert")
+  else
+    print("no log for this filetype: ", type)
+  end
 end)
 
+--local builtin = require('telescope.builtin')
+--
+--vim.keymap.set('n', '<leader>vgr', function()
+--  vim.cmd('vimgrep')
+--end)
