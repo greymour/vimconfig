@@ -24,9 +24,10 @@ lsp.nvim_workspace()
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+  ['K'] = cmp.mapping.select_prev_item(cmp_select),
+  ['J'] = cmp.mapping.select_next_item(cmp_select),
+  ['<S-CR>'] = cmp.mapping.confirm({ select = true }),
+  ['<S-Space>'] = cmp.mapping.abort(),
 })
 
 cmp_mappings['<Tab>'] = nil
