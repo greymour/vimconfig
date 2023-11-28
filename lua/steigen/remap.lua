@@ -48,6 +48,7 @@ local log_table = {
   lua = { "print('%s: ', %s)", 3 },
   go = { "fmt.Printf(\"%s: %%v\", %s)", 1 },
   rust = { "println!(\"%s: {:?}\", %s);", 2 },
+  python = { "print()" },
 }
 
 vim.keymap.set("n", "<leader>ll", function()
