@@ -1,2 +1,2 @@
 .DS_STORE
-packer-compiled.lua
+**/**/packer_compiled.lua
