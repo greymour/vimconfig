@@ -1,5 +1,5 @@
-local builtin = require('telescope.builtin')
 local telescope = require('telescope')
+local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', function()
   builtin.find_files {
     find_command = { 'rg', '--files', '--iglob', '!.git', '--hidden' }
