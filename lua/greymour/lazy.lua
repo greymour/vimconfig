@@ -13,6 +13,9 @@ vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
   {
+    'nvim-lua/plenary.nvim'
+  },
+  {
     'nvim-telescope/telescope.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' }
   },
@@ -59,9 +62,8 @@ local plugins = {
   },
   { "nvim-treesitter/playground" },
   {
-    "theprimeagen/harpoon",
+    "ThePrimeagen/harpoon",
     dependencies = { "nvim-lua/plenary.nvim" },
-    branch = { "harpoon2" }
   },
   { "theprimeagen/refactoring.nvim" },
   -- I never use undotree so commenting out
