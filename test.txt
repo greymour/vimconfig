@@ -1,0 +1,20 @@
+SELECT ps.content FROM ebdb.payments_stripewebhooklog ps
+INNER JOIN patients_userprofile  pu ON ps.stripe_customer_id = pu.stripe_customer_id
+INNER JOIN patients_genericuser pg ON pu.genericuser_ptr_id = pg.id
+WHERE pg.email = "plushcare.mail+ef59be6c@gmail.com"
+ORDER BY ps.stripe_customer_id, ps.id DESC
+LIMIT 100;
+
+SELECT ps.content FROM ebdb.payments_stripewebhooklog ps
+INNER JOIN patients_userprofile  pu ON ps.stripe_customer_id = pu.stripe_customer_id
+INNER JOIN patients_genericuser pg ON pu.genericuser_ptr_id = pg.id
+WHERE pg.email = "kurt+098098@plushcare.com"
+ORDER BY ps.stripe_customer_id, ps.id DESC
+LIMIT 100;
+
+SELECT ps.content FROM ebdb.payments_stripewebhooklog ps
+INNER JOIN patients_userprofile  pu ON ps.stripe_customer_id = pu.stripe_customer_id
+INNER JOIN patients_genericuser pg ON pu.genericuser_ptr_id = pg.id
+WHERE pg.email = "kurt+spouse@plushcare.com"
+ORDER BY ps.stripe_customer_id, ps.id DESC
+LIMIT 100;
