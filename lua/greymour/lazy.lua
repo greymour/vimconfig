@@ -100,4 +100,9 @@ local plugins = {
   { 'smithbm2316/centerpad.nvim' }
 }
 
+-- if this returns '/' then we're on macos, which means it's my work laptop
+if package.config:sub(1, 1) == '/' then
+  table.insert(plugins, { 'github/copilot.vim' })
+end
+
 require("lazy").setup(plugins)
