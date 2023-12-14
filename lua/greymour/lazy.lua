@@ -96,7 +96,8 @@ local plugins = {
     'lewis6991/gitsigns.nvim',
     config = function() require('gitsigns').setup() end
   },
-  { 'windwp/nvim-ts-autotag' }
+  { 'windwp/nvim-ts-autotag' },
+  { 'smithbm2316/centerpad.nvim' }
 }
 
 require("lazy").setup(plugins)
