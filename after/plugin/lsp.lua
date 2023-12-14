@@ -4,25 +4,6 @@ local autocmd = vim.api.nvim_create_autocmd
 
 lsp.preset("recommended")
 
-lsp.ensure_installed({
-  'tsserver',
-  'rust_analyzer',
-  'eslint',
-  'pyright',
-  'gopls',
-  'jsonls',
-  'bashls',
-  'dockerls',
-  'cssls',
-  'marksman',
-  'lua_ls',
-  'pylsp',
-})
-
--- Fix Undefined global 'vim'
-lsp.nvim_workspace()
-
-
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
@@ -36,12 +17,23 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 cmp_mappings['<Tab>'] = nil
 cmp_mappings['<S-Tab>'] = nil
 
-lsp.setup_nvim_cmp({
-  cmp.PreselectMode.None,
-  mapping = cmp_mappings,
+cmp.setup({
+  -- add these back in if I decide I want bordered windows (need to pass in a few other options as well)
+  --  window = {
+  --    completion = cmp.config.window.bordered(),
+  --    documentation = cmp.config.window.bordered(),
+  --  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<S-Space>'] = cmp.mapping.abort(),
+    ['<C-Space>'] = cmp.mapping.complete(),
+  }),
+  sources = {
+    { name = 'nvim_lsp' }
+  }
 })
-
--- this doesn't seem to be always working, interesting
 
 lsp.set_preferences({
   suggest_lsp_servers = true,
@@ -53,31 +45,29 @@ lsp.set_preferences({
   }
 })
 
-lspconfig.pyright.setup({
-  settings = {
-    python = {
-      analysis = {
-        typeCheckingMode = "strict",
-        autoSearchPaths = true,
-        useLibraryCodeForTypes = true,
-        diagnosticMode = "workspace",
-        stubPath = vim.fn.stdpath('data') .. '/stubs'
-      }
-    }
-  }
-})
+-- not using pyright at the moment, testing to see if pylsp is enough
+-- lspconfig.pyright.setup({
+--   settings = {
+--     python = {
+--       analysis = {
+--         typeCheckingMode = "strict",
+--         autoSearchPaths = true,
+--         useLibraryCodeForTypes = true,
+--         diagnosticMode = "workspace",
+--         stubPath = vim.fn.stdpath('data') .. '/stubs'
+--       }
+--     }
+--   }
+-- })
 
 
 autocmd("BufWritePre", {
   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
-  callback = function() vim.cmd("EslintFixAll") end
-})
-
-autocmd("BufWritePre", {
-  pattern = { '*.py' },
   callback = function()
-    print('trying to format python')
-    --os.execute('python3 -m autopep8 --in-place --aggressive ' .. vim.fn.expand('%:p'))
+    -- this makes it so that if eslint isn't installed in a project, we don't get an error on every save
+    if vim.fn.exists(':EslintFixAll') > 0 then
+      vim.cmd("EslintFixAll")
+    end
   end
 })
 
@@ -87,13 +77,63 @@ vim.lsp.buf.format {
   end
 }
 
--- IM" CONFIGURING ALL THIS SHIT WRONG
--- I'M USING MASON TO MANAGE THIS SHIT SO NONE OF HTIS IS WORKINGGGGG
--- https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/lsp.md#configure-language-servers
+lsp.on_attach(function(client, bufnr)
+  local opts = { buffer = bufnr, remap = false }
+  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+
+
+  local supported_types = { 'javascriptreact', 'typescriptreact', 'typescript', 'javascript', 'lua', 'go', 'rust',
+    'python'
+  }
+
+  autocmd("BufWritePre", {
+    callback = function()
+      local type = vim.bo.filetype
+      if vim.tbl_contains(supported_types, type) then
+        vim.lsp.buf.format()
+      end
+    end
+  })
+end)
+
 require('mason').setup({})
 require('mason-lspconfig').setup({
+  ensure_installed = {
+    'tsserver',
+    'rust_analyzer',
+    'eslint',
+    -- 'pyright',
+    'gopls',
+    'jsonls',
+    'bashls',
+    'dockerls',
+    'cssls',
+    'marksman',
+    'lua_ls',
+    'pylsp',
+  },
   handlers = {
-    pyright = lspconfig.pyright.setup {},
+    lsp.default_setup,
+    lua_ls = lspconfig.lua_ls.setup {
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { 'vim' }
+          }
+        }
+      }
+    },
+    -- if I want to use pyright, use the commented out setup function above
+    --    pyright = lspconfig.pyright.setup {},
     pylsp = function()
       lspconfig.pylsp.setup({
         settings = {
@@ -115,7 +155,7 @@ require('mason-lspconfig').setup({
               },
               flake8 = {
                 enabled = true,
-                --max_line_length = 120,
+                maxLineLength = 120,
                 -- ignore = {},
                 -- extend_ignore = {}
               },
@@ -146,36 +186,7 @@ require('mason-lspconfig').setup({
   }
 })
 
-lsp.on_attach(function(client, bufnr)
-  local opts = { buffer = bufnr, remap = false }
 
-  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
-  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
-  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
-
-
-  local supported_types = { 'javascriptreact', 'typescriptreact', 'typescript', 'javascript', 'lua', 'go', 'rust',
-    --'python'
-  }
-
-  autocmd("BufWritePre", {
-    callback = function()
-      local type = vim.bo.filetype
-      if vim.tbl_contains(supported_types, type) then
-        vim.lsp.buf.format()
-      end
-    end
-  })
-end)
-lsp.setup()
---
--- vim.diagnostic.config({
---   virtual_text = true
--- })
+vim.diagnostic.config({
+  virtual_text = true
+})
