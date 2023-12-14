@@ -72,7 +72,7 @@ local plugins = {
   { "nvim-treesitter/nvim-treesitter-context" },
   {
     'VonHeikemen/lsp-zero.nvim',
-    branch = 'v1.x',
+    branch = 'v3.x',
     dependencies = {
       -- LSP Support
       { 'neovim/nvim-lspconfig' },
@@ -96,7 +96,13 @@ local plugins = {
     'lewis6991/gitsigns.nvim',
     config = function() require('gitsigns').setup() end
   },
-  { 'windwp/nvim-ts-autotag' }
+  { 'windwp/nvim-ts-autotag' },
+  { 'smithbm2316/centerpad.nvim' }
 }
+
+-- if this returns '/' then we're on macos, which means it's my work laptop
+if package.config:sub(1, 1) == '/' then
+  table.insert(plugins, { 'github/copilot.vim' })
+end
 
 require("lazy").setup(plugins)
