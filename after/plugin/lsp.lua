@@ -92,7 +92,7 @@ lsp.on_attach(function(client, bufnr)
 
 
   local supported_types = { 'javascriptreact', 'typescriptreact', 'typescript', 'javascript', 'lua', 'go', 'rust',
-    'python'
+    'python', 'kotlin',
   }
 
   autocmd("BufWritePre", {
@@ -120,6 +120,7 @@ require('mason-lspconfig').setup({
     'marksman',
     'lua_ls',
     'pylsp',
+    'kotlin_language_server',
   },
   handlers = {
     lsp.default_setup,
@@ -182,6 +183,10 @@ require('mason-lspconfig').setup({
     }),
     yamlls = lspconfig.yamlls.setup({
       filetypes = { "yaml", "yml" }
+    }),
+    kotlin_language_server = lspconfig.kotlin_language_server.setup({
+      cmd = { "kotlin-language-server" },
+      filetypes = { "kotlin" },
     }),
   }
 })
