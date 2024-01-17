@@ -48,24 +48,20 @@ local log_table = {
   lua = { "print('%s: ', %s)", 0 },
   go = { "fmt.Printf(\"%s: %%v\", %s)", 1 },
   rust = { "println!(\"%s: {:?}\", %s);", 2 },
-  python = { "print()" },
+  python = { "print('')", 0 },
 }
+
 vim.keymap.set("n", "<leader>ll", function()
   local type = vim.bo.filetype
-  --print(vim.inspect(type))
   if log_table[type] then
-    --local line = vim.api.nvim_win_get_cursor(0)[1]
-    -- local text = vim.api.nvim_get_current_line()
-    -- local new_text = string.format(log_table[type][1], line, '')
-    vim.cmd'normal o'
-    --vim.api.nvim_set_current_line(new_text)
-    --vim.api.nvim_win_set_cursor(0, { line + 1, #new_text - log_table[type][2] })
-    --vim.cmd("startinsert")
+    local line = vim.api.nvim_win_get_cursor(0)[1]
+    local new_text = string.format(log_table[type][1], line, '')
+    vim.cmd(string.format('normal o%s', new_text))
+    vim.cmd("startinsert")
   else
     print("no log for this filetype: ", type)
   end
 end)
-
 
 -- copies the current filename to system clipboard
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
