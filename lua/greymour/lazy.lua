@@ -97,7 +97,19 @@ local plugins = {
     config = function() require('gitsigns').setup() end
   },
   { 'windwp/nvim-ts-autotag' },
-  { 'smithbm2316/centerpad.nvim' }
+  {
+    'shortcuts/no-neck-pain.nvim',
+    config = function()
+      require('no-neck-pain').setup({
+        width = 115,
+        minSideBufferWidth = 10,
+        mappings = {
+          enabled = true,
+          toggle = '<leader>np',
+        }
+      })
+    end
+  },
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
