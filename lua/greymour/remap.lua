@@ -1,5 +1,9 @@
+-- set leader to space instead of backslash
 vim.g.mapleader = " "
+-- change default map for opening netrw to <leader>pv
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+-- Line numbers etc in Netrw
+vim.cmd([[let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro']])
 -- these two make it so that when highlighting lines, by holding shift + using
 -- either K or J, we can move those hightlighted lines up or down accordingly
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -10,34 +14,40 @@ vim.keymap.set("n", "J", "mzJ`z")
 -- ctrl + d & ctrl + u jump by half a page, maintain cursor position
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
+-- `n` skips to next occurence of symbol under cursor
 vim.keymap.set("n", "n", "nzzzv")
+-- `N` skips to previous occurence of symbol under cursor
 vim.keymap.set("n", "N", "Nzzzv")
 
 -- greatest remap ever
+-- allows pasting of text above/below current line, and left/right of cursor
+-- also pastes without overwriting clipboard
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- next greatest remap ever : asbjornHaland
+-- copies highlighted text to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+-- copies whole line to system clipboard
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
--- This is going to get me cancelled
+-- Control C exits insert mode
 vim.keymap.set("i", "<C-c>", "<Esc>")
 
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
+-- triggers formatting
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
-
+-- searches for string under cursor (works for variable names, keywords, etc. whatever is under the cursor)
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
-vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.dotfiles/nvim/.config/nvim/lua/theprimeagen/packer.lua<CR>");
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
 local log_table = {
