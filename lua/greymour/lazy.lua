@@ -98,6 +98,10 @@ local plugins = {
   },
   { 'windwp/nvim-ts-autotag' },
   { 'smithbm2316/centerpad.nvim' }
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
+  },
 }
 
 -- if this returns '/' then we're on macos, which means it's my work laptop
