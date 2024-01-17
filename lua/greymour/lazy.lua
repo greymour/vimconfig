@@ -26,6 +26,11 @@ local plugins = {
     config = function()
       vim.g.material_style = "palenight"
       vim.cmd 'colorscheme material'
+      -- sets all line numbers to white
+      vim.cmd ':hi LineNr guibg=#7253c6 guifg=#ffffff'
+      -- overrides the LineNr setting for lines above and below the current line to an off-white
+      vim.cmd ':hi LineNrAbove guibg=none guifg=#bfbfbf'
+      vim.cmd ':hi LineNrBelow guibg=none guifg=#bfbfbf'
     end
   },
   {
