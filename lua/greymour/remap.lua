@@ -73,6 +73,37 @@ vim.keymap.set("n", "<leader>ll", function()
   end
 end)
 
+local comment_table = {
+  javascriptreact = '//',
+  typescriptreact = '//',
+  typescript = '//',
+  javascript = '//',
+  lua = '--',
+  go = '//',
+  rust = '//',
+  python = '#',
+}
+
+-- @TODO: make this work for removing comments as well
+-- insert the comment character for the current file type at the start of each line in the range from the start to the end of the visual selection
+vim.keymap.set('v', '<leader>/', function()
+  local type = vim.bo.filetype
+  if log_table[type] then
+    -- vim.fn.getpos() only works for the start and end of the PREVIOUS visual selection, so doing this exits visual mode
+    vim.cmd("normal v")
+    local start = vim.fn.getpos("'<")
+    local finish = vim.fn.getpos("'>")
+    local line = start[2]
+    local end_line = finish[2]
+    local comment = comment_table[type]
+    for i = line, end_line do
+      vim.cmd(string.format('%d,%d s/^/%s /', i, i, comment))
+    end
+  else
+    print("no log for this filetype: ", type)
+  end
+end, {})
+
 -- copies the current filename to system clipboard
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 

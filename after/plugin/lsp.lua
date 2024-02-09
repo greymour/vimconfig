@@ -44,22 +44,13 @@ lsp.set_preferences({
     info = 'I'
   }
 })
-
--- not using pyright at the moment, testing to see if pylsp is enough
--- lspconfig.pyright.setup({
---   settings = {
---     python = {
---       analysis = {
---         typeCheckingMode = "strict",
---         autoSearchPaths = true,
---         useLibraryCodeForTypes = true,
---         diagnosticMode = "workspace",
---         stubPath = vim.fn.stdpath('data') .. '/stubs'
---       }
---     }
---   }
--- })
-
+-- @NOTE re: styled components:
+-- To get autocompletion/LSP support in styled-components, follow the Visual Studio instructions
+-- here: https://github.com/styled-components/typescript-styled-plugin?tab=readme-ov-file#with-visual-studio
+-- and then run `TSInstall css` in the nvim command line to get syntax highlighting
+--
+-- I might be able to get this working w/o needing to install the plugin into the project and instead use a global
+-- config, but I haven't been able to get that to work yet, and it's not worth the time
 
 autocmd("BufWritePre", {
   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
@@ -121,6 +112,7 @@ require('mason-lspconfig').setup({
     'lua_ls',
     'pylsp',
     'kotlin_language_server',
+    'sqlls',
   },
   handlers = {
     lsp.default_setup,
@@ -133,17 +125,40 @@ require('mason-lspconfig').setup({
         }
       }
     },
-    -- if I want to use pyright, use the commented out setup function above
-    --    pyright = lspconfig.pyright.setup {},
+    -- pylsp with mypy seems to be working fine after restarting the terminal, so will continue using that
+    -- setup; if I get the freeze on save issue again, will try switching back
+    -- pylsp with mypy seems to struggle a bit on really large files
+    -- (eg. payments/models.py in PlushCare API is 1700 LOC), so might be worth switching back to see
+    -- the difference
+    -- if I want to use pyright, use the commented out setup function below
+    --    pyright = lspconfig.pyright.setup {
+    --      settings = {
+    --        python = {
+    --          analysis = {
+    --            typeCheckingMode = "strict",
+    --            autoSearchPaths = true,
+    --            useLibraryCodeForTypes = true,
+    --            diagnosticMode = "workspace",
+    --            stubPath = vim.fn.stdpath('data') .. '/stubs'
+    --          }
+    --        }
+    --      }
+    --    },
+    --  On my work computer, pylsp gets installed into ~/.local/share/nvim/mason/packages/python-lsp-server.
+    --  To install type stubs and pylsp plugins I need to activate the venv in that folder, and then install
+    --  them manually using pip in isolated mode, as otherwise I get AWS code artifact 401 errors.
+    --  I'm too lazy to figure out an actual fix for this.
+    --  To install plugins, go into the pylsp install directory, activate the venv, and do
+    --  `pip --isolated install <plugin>`, e.g. `pip --isolated install pylsp-mypy`
+    --  Have to install mypy to get type checking with pylsp, instead of needing something like pyright.
     pylsp = function()
       lspconfig.pylsp.setup({
         settings = {
           pylsp = {
-            configuration_sources = { "flake8" },
+            configurationSources = { "flake8" },
             plugins = {
               pycodestyle = {
                 enabled = false,
-                -- max_line_length = 120
               },
               mccabe = {
                 enabled = false
@@ -156,9 +171,7 @@ require('mason-lspconfig').setup({
               },
               flake8 = {
                 enabled = true,
-                maxLineLength = 120,
-                -- ignore = {},
-                -- extend_ignore = {}
+                --maxLineLength = 120,
               },
               autopep8 = {
                 enabled = true,

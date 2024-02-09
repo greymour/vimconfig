@@ -2,7 +2,7 @@ require("greymour.set")
 require("greymour.remap")
 require("greymour.lazy")
 local augroup = vim.api.nvim_create_augroup
-local ThePrimeagenGroup = augroup('ThePrimeagen', {})
+local GreymourGroup = augroup('greymour', {})
 
 local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup('HighlightYank', {})
@@ -22,8 +22,9 @@ autocmd('TextYankPost', {
   end,
 })
 
+-- I forget what this does
 autocmd({ "BufWritePre" }, {
-  group = ThePrimeagenGroup,
+  group = GreymourGroup,
   pattern = "*",
   command = [[%s/\s\+$//e]],
 })

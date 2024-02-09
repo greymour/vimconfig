@@ -61,6 +61,7 @@ local plugins = {
       }
     end
   },
+  -- to get syntax highlighting for styled-components, run TSInstall css
   {
     'nvim-treesitter/nvim-treesitter',
     run = function()
@@ -68,7 +69,6 @@ local plugins = {
       ts_update()
     end,
   },
-  { "nvim-treesitter/playground" },
   {
     "ThePrimeagen/harpoon",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -109,7 +109,7 @@ local plugins = {
     'shortcuts/no-neck-pain.nvim',
     config = function()
       require('no-neck-pain').setup({
-        width = 115,
+        width = 130,
         minSideBufferWidth = 10,
         mappings = {
           enabled = true,
