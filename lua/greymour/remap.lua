@@ -51,25 +51,34 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
 local log_table = {
-  javascriptreact = { "console.log('%s: ', %s);", 3 },
-  typescriptreact = { "console.log('%s: ', %s);", 3 },
-  typescript = { "console.log('%s: ', %s);", 3 },
-  javascript = { "console.log('%s: ', %s);", 3 },
-  lua = { "print('%s: ', %s)", 0 },
-  go = { "fmt.Printf(\"%s: %%v\", %s)", 1 },
-  rust = { "println!(\"%s: {:?}\", %s);", 2 },
-  python = { "print('')", 0 },
+  javascriptreact = "console.log('%s: ', %s);",
+  typescriptreact = "console.log('%s: ', %s);",
+  typescript = "console.log('%s: ', %s);",
+  javascript = "console.log('%s: ', %s);",
+  lua = "print('%s: ', %s)",
+  go = "fmt.Printf(\"%s: %%v\", %s)",
+  rust = "println!(\"%s: {:?}\", %s);",
+  python = "print('')",
 }
 
+-- using normal o to open a new line below the current line, and then insert the new text
+-- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
+-- which starts inserting text behind the cursor
 vim.keymap.set("n", "<leader>ll", function()
-  local type = vim.bo.filetype
-  if log_table[type] then
+  local filetype = vim.bo.filetype
+  local log_cmd = log_table[filetype]
+  if type(log_cmd) == 'string' then
     local line = vim.api.nvim_win_get_cursor(0)[1]
-    local new_text = string.format(log_table[type][1], line, '')
+    local new_text = string.format(log_cmd, line, '')
     vim.cmd(string.format('normal o%s', new_text))
+
+    if string.sub(log_cmd, -1) == ';' then
+      vim.cmd("normal <Left>")
+    end
+
     vim.cmd("startinsert")
   else
-    print("no log for this filetype: ", type)
+    print("no log for this filetype: ", filetype)
   end
 end)
 
