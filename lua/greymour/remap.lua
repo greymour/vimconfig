@@ -151,7 +151,7 @@ local error_handler_table = {
   typescriptreact = { 'try {\n} catch(e) {\n}', 1 },
   typescript = { 'try {\n} catch(e) {\n}', 1 },
   javascript = { 'try {\n} catch(e) {\n}', 1 },
-  go = { 'if err != nil {\nreturn err\n}' },
+  go = { 'if err != nil {\nreturn err\n}', 0 },
   lua = { 'if pcall() then\nelse\nend', 2, 'normal f(' },
   python = { 'try:\nexcept Exception as e:\n', 1 },
   rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal f{h' },
