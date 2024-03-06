@@ -146,8 +146,3 @@ vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 -- copies the current file path relative to the project root to the system clipboard
 -- eg in ~/.config/nvim/lua/greymour/remap.lua, it would copy lua/greymour/remap.lua
 vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand(\"%\")<CR>")
---local builtin = require('telescope.builtin')
---
---vim.keymap.set('n', '<leader>vgr', function()
---  vim.cmd('vimgrep')
---end)
