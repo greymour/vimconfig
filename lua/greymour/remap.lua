@@ -141,6 +141,38 @@ vim.keymap.set({ 'v', 'n' }, '<leader>/', function()
   vim.cmd("normal " .. end_step)
 end, {})
 
+-- typescriptreact = 'try {\n} catch(e) {\n}',
+-- typescript = 'try {\n} catch(e) {\n}',
+-- javascript = 'try {\n} catch(e) {\n}',
+-- go = 'if err != nil {\nreturn err\n}',
+-- lua = 'if pcall() then \n else \n end',
+--
+
+local error_handler_table = {
+  javascriptreact = 'try { } catch(e) { }',
+  typescriptreact = 'try { } catch(e) { }',
+  typescript = 'try { } catch(e) { }',
+  javascript = 'try { } catch(e) { }',
+  go = 'if err != nil { return err }',
+  lua = 'if pcall() then else end',
+  python = 'try: except Exception as e: ',
+  -- need to get name of symbol under cursor to make this work right for Rust
+  rust = 'match _ { Ok(_) => {}, Err(e) => {} }',
+}
+
+vim.keymap.set("n", "<leader>tc", function()
+  local file_type = vim.bo.filetype
+  local error_handler = error_handler_table[file_type]
+  if type(error_handler) ~= "string" then
+    print("no error handler for this filetype: ", file_type)
+    return
+  end
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local new_text = string.format(error_handler, line, '')
+  vim.cmd(string.format('normal o%s', new_text))
+  vim.cmd("startinsert")
+end)
+
 -- copies the current filename to system clipboard
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 -- copies the current file path relative to the project root to the system clipboard
