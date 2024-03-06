@@ -141,36 +141,54 @@ vim.keymap.set({ 'v', 'n' }, '<leader>/', function()
   vim.cmd("normal " .. end_step)
 end, {})
 
--- typescriptreact = 'try {\n} catch(e) {\n}',
--- typescript = 'try {\n} catch(e) {\n}',
--- javascript = 'try {\n} catch(e) {\n}',
--- go = 'if err != nil {\nreturn err\n}',
--- lua = 'if pcall() then \n else \n end',
---
-
+-- table: {
+--   error_handler string,
+--   number_of_lines to move up after pasting in error handler,
+--   [optional] normal command to move to the symbol to the correct column on the current line
+-- }
 local error_handler_table = {
-  javascriptreact = 'try { } catch(e) { }',
-  typescriptreact = 'try { } catch(e) { }',
-  typescript = 'try { } catch(e) { }',
-  javascript = 'try { } catch(e) { }',
-  go = 'if err != nil { return err }',
-  lua = 'if pcall() then else end',
-  python = 'try: except Exception as e: ',
-  -- need to get name of symbol under cursor to make this work right for Rust
-  rust = 'match _ { Ok(_) => {}, Err(e) => {} }',
+  javascriptreact = { 'try {\n} catch(e) {\n}', 1 },
+  typescriptreact = { 'try {\n} catch(e) {\n}', 1 },
+  typescript = { 'try {\n} catch(e) {\n}', 1 },
+  javascript = { 'try {\n} catch(e) {\n}', 1 },
+  go = { 'if err != nil {\nreturn err\n}' },
+  lua = { 'if pcall() then\nelse\nend', 2, 'normal f(' },
+  python = { 'try:\nexcept Exception as e:\n', 1 },
+  rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal f{h' },
 }
 
 vim.keymap.set("n", "<leader>tc", function()
   local file_type = vim.bo.filetype
   local error_handler = error_handler_table[file_type]
-  if type(error_handler) ~= "string" then
+  if type(error_handler) ~= "table" then
     print("no error handler for this filetype: ", file_type)
     return
   end
-  local line = vim.api.nvim_win_get_cursor(0)[1]
-  local new_text = string.format(error_handler, line, '')
-  vim.cmd(string.format('normal o%s', new_text))
-  vim.cmd("startinsert")
+
+  local line_number = vim.api.nvim_win_get_cursor(0)[1]
+  local line_str = vim.fn.getline(line_number)
+  local move_symbol = false
+
+  if line_str:len() > 0 then
+    move_symbol = true
+    vim.cmd("normal ^d$")
+  end
+
+  local number_of_lines = error_handler[2]
+  for s in error_handler[1]:gmatch("[^\r\n]+") do
+    number_of_lines = number_of_lines + 1
+    vim.cmd(string.format('normal o%s', s))
+    vim.cmd("stopinsert")
+    vim.cmd('normal o')
+    vim.cmd("stopinsert")
+  end
+  vim.cmd(string.format("normal %ik", number_of_lines))
+  if error_handler[3] then
+    vim.cmd(error_handler[3])
+  end
+  if move_symbol then
+    vim.cmd("normal p")
+  end
 end)
 
 -- copies the current filename to system clipboard
