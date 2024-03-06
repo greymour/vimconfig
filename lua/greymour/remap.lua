@@ -84,24 +84,52 @@ local comment_table = {
   python = '#',
 }
 
--- @TODO: make this work for removing comments as well
--- insert the comment character for the current file type at the start of each line in the range from the start to the end of the visual selection
-vim.keymap.set('v', '<leader>/', function()
-  local type = vim.bo.filetype
-  if log_table[type] then
-    -- vim.fn.getpos() only works for the start and end of the PREVIOUS visual selection, so doing this exits visual mode
-    vim.cmd("normal v")
-    local start = vim.fn.getpos("'<")
-    local finish = vim.fn.getpos("'>")
-    local line = start[2]
-    local end_line = finish[2]
-    local comment = comment_table[type]
-    for i = line, end_line do
-      vim.cmd(string.format('%d,%d s/^/%s /', i, i, comment))
-    end
-  else
-    print("no log for this filetype: ", type)
+-- insert the comment character for the current file type at the start of each line in the range from the start to the
+-- end of the visual selection
+vim.keymap.set({ 'v', 'n' }, '<leader>/', function()
+  local file_type = vim.bo.filetype
+  if type(comment_table[file_type]) ~= "string" then
+    print("no log for this filetype: ", file_type)
+    return
   end
+  -- vim.fn.getpos() only works for the start and end of the PREVIOUS visual selection, so doing this exits visual mode
+  vim.cmd("normal v")
+  -- see :h getpos for what the values here are
+  local start_line = vim.fn.getpos("'<")[2]
+  local end_line = vim.fn.getpos("'>")[2]
+  local comment = comment_table[file_type]
+  local comment_len = string.len(comment)
+  local line_str = vim.fn.getline(start_line)
+
+  if comment_len < 1 then
+    print("no comment character for this filetype: ", file_type)
+    return
+  end
+  -- the start and end of the selection don't care about whether the highlighting is from top to bottom or bottom to top
+  -- so we need to move the cursor to the bottom (or top) of the selection to force the direction to be consistent
+  vim.api.nvim_win_set_cursor(0, { start_line, 0 })
+  -- @TODO: make these use <Up> and <Down>, probably need to not use the "normal" cmd tho
+  --   - not using "normal" throws an error, weird - maybe rework how I'm calling this?
+  local step_cmd = "j"
+  local end_step = "k"
+  print('steps: ', step_cmd, end_step)
+  for _ = start_line, end_line do
+    -- this means we're adding a comment, idk how this regex actually works
+    if string.sub(string.gsub(line_str, "%s+", ""), 1, comment_len) ~= comment then
+      vim.cmd("normal ^i" .. comment .. ' ')
+      vim.cmd("stopinsert")
+      vim.cmd("normal " .. step_cmd)
+    else
+      -- @TODO: I'm assume that there's a space after the comment character, should probably do some strip stuff here
+      -- @TODO: if the first line is commented but other lines are not, this will delete the first n characters of
+      -- the non-commented lines
+      -- will need to move the `line_str` assignment to inside the loop, and then do some checking to see if the line
+      -- is commented or not
+      vim.cmd("normal ^" .. comment_len + 1 .. "x")
+      vim.cmd("normal " .. step_cmd)
+    end
+  end
+  vim.cmd("normal " .. end_step)
 end, {})
 
 -- copies the current filename to system clipboard
