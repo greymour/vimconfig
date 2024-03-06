@@ -178,7 +178,10 @@ require('mason-lspconfig').setup({
               },
               yapf = {
                 enabled = false,
-              }
+              },
+              isort = {
+                enabled = false,
+              },
             }
           },
         }
