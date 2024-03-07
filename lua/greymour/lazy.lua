@@ -71,6 +71,7 @@ local plugins = {
   },
   {
     "ThePrimeagen/harpoon",
+    -- branch = "harpoon2",
     dependencies = { "nvim-lua/plenary.nvim" },
   },
   { "theprimeagen/refactoring.nvim" },
@@ -121,6 +122,10 @@ local plugins = {
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
+  },
+  {
+    'virchau13/tree-sitter-astro',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
 }
 

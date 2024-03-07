@@ -113,6 +113,7 @@ require('mason-lspconfig').setup({
     'pylsp',
     'kotlin_language_server',
     'sqlls',
+    'astro',
   },
   handlers = {
     lsp.default_setup,
