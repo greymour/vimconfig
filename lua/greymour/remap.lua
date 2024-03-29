@@ -169,16 +169,16 @@ end, {})
 --   number_of_lines to move up after pasting in error handler,
 --   [optional] normal command to move to the symbol to the correct column on the current line
 -- }
+local js_log_table = { 'try {\n _\n} catch (e) {\nconsole.error(\'error: \', e);\n}', 3 }
 local error_handler_table = {
-  javascriptreact = { 'try {\n} catch(e) {\n}', 2 },
-  typescriptreact = { 'try {\n} catch(e) {\n}', 2 },
-  typescript = { 'try {\n} catch(e) {\n}', 2 },
-  javascript = { 'try {\n} catch(e) {\n}', 2, },
+  javascriptreact = js_log_table,
+  typescriptreact = js_log_table,
+  typescript = js_log_table,
+  javascript = js_log_table,
   go = { 'if err != nil {\nreturn err\n}', 0 },
-  lua = { 'if pcall() then\nelse\nend', 2, 'normal f(' },
-  -- python is fucked, have to fix it somehow
-  python = { 'try:\nexcept Exception as e:\n', 1 },
-  rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal f{h' },
+  lua = { 'if pcall() then\nelse\nend', 2, 'normal! f(' },
+  python = { 'try:\npass\nexcept Exception as e:\npass', 2 },
+  rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal! f{h' },
 }
 
 vim.keymap.set("n", "<leader>tc", function()
@@ -189,22 +189,17 @@ vim.keymap.set("n", "<leader>tc", function()
     return
   end
 
-  local number_of_lines = error_handler[2]
   for s in error_handler[1]:gmatch("[^\r\n]+") do
-    number_of_lines = number_of_lines + 1
-    vim.cmd(string.format('normal o%s', s))
-    vim.cmd("stopinsert")
-    vim.cmd('normal! o')
+    vim.cmd(string.format('normal! o%s', s))
     vim.cmd("stopinsert")
   end
-  vim.cmd(string.format("normal! %ik", number_of_lines))
+  vim.cmd(string.format("normal! %ik", error_handler[2]))
   if error_handler[3] then
     vim.cmd(error_handler[3])
   else
-    vim.cmd("normal! j")
-    vim.cmd("normal! dd")
-    vim.cmd("normal! k")
+    vim.cmd('normal! ^dw')
   end
+  vim.cmd("startinsert")
 end)
 
 -- copies the current filename to system clipboard
