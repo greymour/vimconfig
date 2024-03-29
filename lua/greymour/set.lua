@@ -18,12 +18,12 @@ autocmd("BufEnter", {
   command = "setlocal wrap linebreak"
 })
 
-
-local HOME = os.getenv("HOME") and os.getenv("HOME") or os.getenv("LOCALAPPDATA")
+-- @TODO: get rid of this shit
+-- local HOME = os.getenv("HOME") and os.getenv("HOME") or os.getenv("LOCALAPPDATA")
 
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = HOME .. "/.vim/undodir"
+-- vim.opt.undodir = HOME .. "/.vim/undodir"
 vim.opt.undofile = true
 
 vim.opt.hlsearch = false
