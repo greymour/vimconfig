@@ -79,7 +79,7 @@ vim.keymap.set("n", "<leader>ll", function()
   else
     new_text = string.format(log_cmd, line_number, '')
   end
-  vim.cmd(string.format('normal o%s', new_text))
+  vim.cmd(string.format('normal! o%s', new_text))
 
   if string.sub(log_cmd, -1) == ';' then
     vim.cmd("normal! h")
@@ -170,12 +170,13 @@ end, {})
 --   [optional] normal command to move to the symbol to the correct column on the current line
 -- }
 local error_handler_table = {
-  javascriptreact = { 'try {\n} catch(e) {\n}', 1 },
-  typescriptreact = { 'try {\n} catch(e) {\n}', 1 },
-  typescript = { 'try {\n} catch(e) {\n}', 1 },
-  javascript = { 'try {\n} catch(e) {\n}', 1 },
+  javascriptreact = { 'try {\n} catch(e) {\n}', 2 },
+  typescriptreact = { 'try {\n} catch(e) {\n}', 2 },
+  typescript = { 'try {\n} catch(e) {\n}', 2 },
+  javascript = { 'try {\n} catch(e) {\n}', 2, },
   go = { 'if err != nil {\nreturn err\n}', 0 },
   lua = { 'if pcall() then\nelse\nend', 2, 'normal f(' },
+  -- python is fucked, have to fix it somehow
   python = { 'try:\nexcept Exception as e:\n', 1 },
   rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal f{h' },
 }
@@ -188,29 +189,21 @@ vim.keymap.set("n", "<leader>tc", function()
     return
   end
 
-  local line_number = vim.api.nvim_win_get_cursor(0)[1]
-  local line_str = vim.fn.getline(line_number)
-  local move_symbol = false
-
-  if line_str:len() > 0 then
-    move_symbol = true
-    vim.cmd("normal ^d$")
-  end
-
   local number_of_lines = error_handler[2]
   for s in error_handler[1]:gmatch("[^\r\n]+") do
     number_of_lines = number_of_lines + 1
     vim.cmd(string.format('normal o%s', s))
     vim.cmd("stopinsert")
-    vim.cmd('normal o')
+    vim.cmd('normal! o')
     vim.cmd("stopinsert")
   end
-  vim.cmd(string.format("normal %ik", number_of_lines))
+  vim.cmd(string.format("normal! %ik", number_of_lines))
   if error_handler[3] then
     vim.cmd(error_handler[3])
-  end
-  if move_symbol then
-    vim.cmd("normal p")
+  else
+    vim.cmd("normal! j")
+    vim.cmd("normal! dd")
+    vim.cmd("normal! k")
   end
 end)
 
