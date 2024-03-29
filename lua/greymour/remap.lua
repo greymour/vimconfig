@@ -50,11 +50,12 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
+local js_log_str = "console.log('%s: ', %s);"
 local log_table = {
-  javascriptreact = "console.log('%s: ', %s);",
-  typescriptreact = "console.log('%s: ', %s);",
-  typescript = "console.log('%s: ', %s);",
-  javascript = "console.log('%s: ', %s);",
+  javascriptreact = js_log_str,
+  typescriptreact = js_log_str,
+  typescript = js_log_str,
+  javascript = js_log_str,
   lua = "print('%s: ', %s)",
   go = "fmt.Printf(\"%s: %%v\", %s)",
   rust = "println!(\"%s: {:?}\", %s);",
@@ -88,24 +89,28 @@ vim.keymap.set("n", "<leader>ll", function()
   vim.cmd("startinsert")
 end)
 
+local dbl_slash = '//'
+local hash = '#'
+
 local comment_table = {
-  javascriptreact = '//',
-  typescriptreact = '//',
-  typescript = '//',
-  javascript = '//',
+  javascriptreact = dbl_slash,
+  typescriptreact = dbl_slash,
+  typescript = dbl_slash,
+  javascript = dbl_slash,
   lua = '--',
-  go = '//',
-  rust = '//',
-  python = '#',
-  bash = '#',
-  sh = '#',
-  zsh = '#',
-  dockerfile = '#',
-  toml = '#',
-  mk = '#',
-  makefile = '#',
-  make = '#',
-  yaml = '#',
+  go = dbl_slash,
+  rust = dbl_slash,
+  python = hash,
+  bash = hash,
+  sh = hash,
+  zsh = hash,
+  dockerfile = hash,
+  toml = hash,
+  mk = hash,
+  makefile = hash,
+  make = hash,
+  yaml = hash,
+  css = '/* */',
 }
 
 
