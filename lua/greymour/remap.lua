@@ -58,7 +58,7 @@ local log_table = {
   lua = "print('%s: ', %s)",
   go = "fmt.Printf(\"%s: %%v\", %s)",
   rust = "println!(\"%s: {:?}\", %s);",
-  python = "print('')",
+  python = "print('%s: ', %s)",
 }
 
 -- using normal o to open a new line below the current line, and then insert the new text
@@ -67,19 +67,25 @@ local log_table = {
 vim.keymap.set("n", "<leader>ll", function()
   local filetype = vim.bo.filetype
   local log_cmd = log_table[filetype]
-  if type(log_cmd) == 'string' then
-    local line = vim.api.nvim_win_get_cursor(0)[1]
-    local new_text = string.format(log_cmd, line, '')
-    vim.cmd(string.format('normal o%s', new_text))
-
-    if string.sub(log_cmd, -1) == ';' then
-      vim.cmd("normal <Left>")
-    end
-
-    vim.cmd("startinsert")
-  else
+  if type(log_cmd) ~= 'string' then
     print("no log for this filetype: ", filetype)
+    return
   end
+  local line_number = vim.api.nvim_win_get_cursor(0)[1]
+  local symbol = vim.fn.expand('<cword>')
+  local new_text = ''
+  if symbol:match("[A-Za-z]") then
+    new_text = string.format(log_cmd, symbol, symbol)
+  else
+    new_text = string.format(log_cmd, line_number, '')
+  end
+  vim.cmd(string.format('normal o%s', new_text))
+
+  if string.sub(log_cmd, -1) == ';' then
+    vim.cmd("normal! h")
+  end
+
+  vim.cmd("startinsert")
 end)
 
 local comment_table = {
