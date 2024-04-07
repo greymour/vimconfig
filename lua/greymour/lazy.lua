@@ -110,12 +110,23 @@ local plugins = {
     'shortcuts/no-neck-pain.nvim',
     config = function()
       require('no-neck-pain').setup({
-        width = 130,
+        width = 150,
         minSideBufferWidth = 10,
         mappings = {
           enabled = true,
           toggle = '<leader>np',
-        }
+        },
+        buffers = {
+          scratchPad = {
+            -- set to `false` to disable auto-saving
+            enabled = true,
+            -- set to `nil` to default to current working directory
+            location = "~/notes/",
+          },
+          bo = {
+            filetype = "md"
+          },
+        },
       })
     end
   },
@@ -129,6 +140,13 @@ local plugins = {
   },
   {
     'prettier/vim-prettier'
+    "roobert/tailwindcss-colorizer-cmp.nvim",
+    -- optionally, override the default options:
+    config = function()
+      require("tailwindcss-colorizer-cmp").setup({
+        color_square_width = 2,
+      })
+    end
   }
 }
 

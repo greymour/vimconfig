@@ -152,9 +152,11 @@ require('mason-lspconfig').setup({
     --  On my work computer, pylsp gets installed into ~/.local/share/nvim/mason/packages/python-lsp-server.
     --  To install type stubs and pylsp plugins I need to activate the venv in that folder, and then install
     --  them manually using pip in isolated mode, as otherwise I get AWS code artifact 401 errors.
-    --  I'm too lazy to figure out an actual fix for this.
-    --  To install plugins, go into the pylsp install directory, activate the venv, and do
-    --  `pip --isolated install <plugin>`, e.g. `pip --isolated install pylsp-mypy`
+    --
+    --  ^ I'm leaving this here for future reference, but the problem was that my global pip config had been set to use
+    --  PlushCare's AWS code artifact, so I had to delete my pip config in ~/.config/pip/pip.conf and everything is
+    --  working fine now
+    --
     --  Have to install mypy to get type checking with pylsp, instead of needing something like pyright.
     pylsp = function()
       lspconfig.pylsp.setup({
