@@ -114,6 +114,7 @@ require('mason-lspconfig').setup({
     'kotlin_language_server',
     'sqlls',
     'astro',
+    'tailwindcss',
   },
   handlers = {
     lsp.default_setup,

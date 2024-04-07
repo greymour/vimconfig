@@ -138,6 +138,15 @@ local plugins = {
     'virchau13/tree-sitter-astro',
     dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
+  {
+    "roobert/tailwindcss-colorizer-cmp.nvim",
+    -- optionally, override the default options:
+    config = function()
+      require("tailwindcss-colorizer-cmp").setup({
+        color_square_width = 2,
+      })
+    end
+  }
 }
 
 -- if this returns '/' then we're on macos, which means it's my work laptop
