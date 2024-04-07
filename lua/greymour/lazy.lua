@@ -127,6 +127,9 @@ local plugins = {
     'virchau13/tree-sitter-astro',
     dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
+  {
+    'prettier/vim-prettier'
+  }
 }
 
 -- if this returns '/' then we're on macos, which means it's my work laptop

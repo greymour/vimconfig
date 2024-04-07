@@ -59,6 +59,9 @@ autocmd("BufWritePre", {
     if vim.fn.exists(':EslintFixAll') > 0 then
       vim.cmd("EslintFixAll")
     end
+    if vim.fn.exists(':Prettier') > 0 then
+      vim.cmd('Prettier')
+    end
   end
 })
 
@@ -114,6 +117,7 @@ require('mason-lspconfig').setup({
     'kotlin_language_server',
     'sqlls',
     'astro',
+    'tailwindcss',
   },
   handlers = {
     lsp.default_setup,
@@ -205,6 +209,7 @@ require('mason-lspconfig').setup({
       cmd = { "kotlin-language-server" },
       filetypes = { "kotlin" },
     }),
+    tailwindcss = lspconfig.tailwindcss.setup {},
   }
 })
 
