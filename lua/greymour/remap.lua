@@ -51,6 +51,7 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
 local js_log_str = "console.log('%s: ', %s);"
+local bash_log_str = "echo '%s: ' $%s"
 local log_table = {
   javascriptreact = js_log_str,
   typescriptreact = js_log_str,
@@ -60,11 +61,16 @@ local log_table = {
   go = "fmt.Printf(\"%s: %%v\", %s)",
   rust = "println!(\"%s: {:?}\", %s);",
   python = "print('%s: ', %s)",
+  sh = bash_log_str,
+  bash = bash_log_str,
 }
 
 -- using normal o to open a new line below the current line, and then insert the new text
 -- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
 -- which starts inserting text behind the cursor
+-- @TODO: add check for if we're in some kind of object/data structure, and if so, insert the log statement
+-- at the end of the object/data structure
+-- also add check for if we're in a function, and if so, insert the function name as the first argument to the log
 vim.keymap.set("n", "<leader>ll", function()
   local filetype = vim.bo.filetype
   local log_cmd = log_table[filetype]
@@ -78,7 +84,7 @@ vim.keymap.set("n", "<leader>ll", function()
   if symbol:match("[A-Za-z]") then
     new_text = string.format(log_cmd, symbol, symbol)
   else
-    new_text = string.format(log_cmd, line_number, '')
+    new_text = string.format(log_cmd, line_number + 1, '')
   end
   vim.cmd(string.format('normal! o%s', new_text))
 
@@ -207,8 +213,23 @@ vim.keymap.set("n", "<leader>tc", function()
   vim.cmd("startinsert")
 end)
 
+-- @TODO: create a function line_has_content that checks if a line has any text in it, so that then I can use that to
+-- decide whether or not to use eg. o to insert a newline or i/a to insert text in the current line
+vim.keymap.set("n", "<leader>td", function()
+  local file_type = vim.bo.filetype
+  local comment_str = comment_table[file_type]
+  if type(comment_str) ~= "string" then
+    print("no comment character for this filetype: ", file_type)
+    return
+  end
+  vim.cmd("normal! o" .. comment_str .. " @TODO: ")
+  vim.cmd("normal! la")
+end)
+
 -- copies the current filename to system clipboard
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 -- copies the current file path relative to the project root to the system clipboard
 -- eg in ~/.config/nvim/lua/greymour/remap.lua, it would copy lua/greymour/remap.lua
 vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand(\"%\")<CR>")
+
+vim.keymap.set("i", "<C-BS>", "<C-w>")
