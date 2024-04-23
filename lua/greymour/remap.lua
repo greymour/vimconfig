@@ -38,7 +38,7 @@ vim.keymap.set("i", "<C-c>", "<Esc>")
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 -- triggers formatting
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+-- vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
 vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
@@ -49,51 +49,6 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
-
-local js_log_str = "console.log('%s: ', %s);"
-local bash_log_str = "echo '%s: ' $%s"
-local log_table = {
-  javascriptreact = js_log_str,
-  typescriptreact = js_log_str,
-  typescript = js_log_str,
-  javascript = js_log_str,
-  lua = "print('%s: ', %s)",
-  go = "fmt.Printf(\"%s: %%v\", %s)",
-  rust = "println!(\"%s: {:?}\", %s);",
-  python = "print('%s: ', %s)",
-  sh = bash_log_str,
-  bash = bash_log_str,
-}
-
--- using normal o to open a new line below the current line, and then insert the new text
--- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
--- which starts inserting text behind the cursor
--- @TODO: add check for if we're in some kind of object/data structure, and if so, insert the log statement
--- at the end of the object/data structure
--- also add check for if we're in a function, and if so, insert the function name as the first argument to the log
-vim.keymap.set("n", "<leader>ll", function()
-  local filetype = vim.bo.filetype
-  local log_cmd = log_table[filetype]
-  if type(log_cmd) ~= 'string' then
-    print("no log for this filetype: ", filetype)
-    return
-  end
-  local line_number = vim.api.nvim_win_get_cursor(0)[1]
-  local symbol = vim.fn.expand('<cword>')
-  local new_text = ''
-  if symbol:match("[A-Za-z]") then
-    new_text = string.format(log_cmd, symbol, symbol)
-  else
-    new_text = string.format(log_cmd, line_number + 1, '')
-  end
-  vim.cmd(string.format('normal! o%s', new_text))
-
-  if string.sub(log_cmd, -1) == ';' then
-    vim.cmd("normal! h")
-  end
-
-  vim.cmd("startinsert")
-end)
 
 local dbl_slash = '//'
 local hash = '#'
