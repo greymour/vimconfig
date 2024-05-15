@@ -72,6 +72,7 @@ local comment_table = {
   make = hash,
   yaml = hash,
   css = '/* */',
+  gleam = dbl_slash,
 }
 
 
@@ -145,6 +146,7 @@ local error_handler_table = {
   lua = { 'if pcall() then\nelse\nend', 2, 'normal! f(' },
   python = { 'try:\npass\nexcept Exception as e:\npass', 2 },
   rust = { 'match {\nOk(_) => {},\nErr(e) => {}\n}', 3, 'normal! f{h' },
+  gleam = { 'match {\nOk(_) => {},\nError(e) => {}\n}', 3, 'normal! f{h' },
 }
 
 vim.keymap.set("n", "<leader>tc", function()

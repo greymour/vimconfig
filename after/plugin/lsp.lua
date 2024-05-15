@@ -208,9 +208,10 @@ require('mason-lspconfig').setup({
       cmd = { "kotlin-language-server" },
       filetypes = { "kotlin" },
     }),
-  }
+  },
 })
 
+lspconfig.gleam.setup {}
 
 vim.diagnostic.config({
   virtual_text = true
