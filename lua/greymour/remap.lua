@@ -170,6 +170,8 @@ vim.keymap.set("n", "<leader>tc", function()
   vim.cmd("startinsert")
 end)
 
+-- @TODO: move all these more complex shortcuts to the shortcuts file I guess
+
 -- @TODO: create a function line_has_content that checks if a line has any text in it, so that then I can use that to
 -- decide whether or not to use eg. o to insert a newline or i/a to insert text in the current line
 vim.keymap.set("n", "<leader>td", function()
@@ -183,10 +185,26 @@ vim.keymap.set("n", "<leader>td", function()
   vim.cmd("normal! la")
 end)
 
+vim.keymap.set("n", "<leader>ic", function()
+  local filetype = vim.bo.filetype
+  local log_cmd = comment_table[filetype]
+  if type(log_cmd) ~= 'string' then
+    print("no log for this filetype: ", filetype)
+    return
+  end
+  vim.cmd(string.format('normal! o%s  ', log_cmd))
+  vim.cmd("normal! $")
+  vim.cmd("startinsert")
+end)
+
 -- copies the current filename to system clipboard
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 -- copies the current file path relative to the project root to the system clipboard
 -- eg in ~/.config/nvim/lua/greymour/remap.lua, it would copy lua/greymour/remap.lua
+-- -- @TODO: sometimes this copies the path all the way from the user root which is annoying as hell, no idea why :D
 vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand(\"%\")<CR>")
 
 vim.keymap.set("i", "<C-BS>", "<C-w>")
+
+-- I hate having to type :messages constantly when debugging my shit
+vim.keymap.set("n", "<leader>mm", "<cmd>:messages<CR>")
