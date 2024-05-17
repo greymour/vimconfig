@@ -196,11 +196,11 @@ require('mason-lspconfig').setup({
     end,
     bashls = lspconfig.bashls.setup({
       cmd = { "bash-language-server", "start" },
-      filetypes = { "sh", "zsh" },
+      filetypes = { "sh", "zsh", "bash", ".bashrc" },
       root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
       settings = {
         bash = {
-          filetypes = { "sh", "zsh" }
+          filetypes = { "sh", "zsh", "bash" }
         }
       }
     }),
@@ -212,6 +212,14 @@ require('mason-lspconfig').setup({
       filetypes = { "kotlin" },
     }),
     tailwindcss = lspconfig.tailwindcss.setup {},
+    eslint = lspconfig.eslint.setup {
+      -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+      -- root_dir = function()
+      --   return vim.fs.dirname(vim.fs.find({ 'eslint.config.mjs' }, { upward = true })[1])
+      -- end,
+      useFlatConfig = true,
+    },
+    gleam = lspconfig.gleam.setup {}
   }
 })
 

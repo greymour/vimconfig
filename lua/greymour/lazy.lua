@@ -139,7 +139,6 @@ local plugins = {
     dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
   {
-    'prettier/vim-prettier'
     "roobert/tailwindcss-colorizer-cmp.nvim",
     -- optionally, override the default options:
     config = function()
@@ -147,7 +146,7 @@ local plugins = {
         color_square_width = 2,
       })
     end
-  }
+  },
 }
 
 -- if this returns '/' then we're on macos, which means it's my work laptop
