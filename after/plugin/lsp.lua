@@ -9,7 +9,7 @@ local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
   ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
   ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  ['<CR>'] = cmp.mapping.confirm({ select = false }),
   ['<S-Space>'] = cmp.mapping.abort(),
   ['<C-Space>'] = cmp.mapping.complete(),
 })
@@ -26,10 +26,11 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
     ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<CR>'] = cmp.mapping.confirm({ select = false }),
     ['<S-Space>'] = cmp.mapping.abort(),
     ['<C-Space>'] = cmp.mapping.complete(),
   }),
+  preselect = cmp.PreselectMode.None,
   sources = {
     { name = 'nvim_lsp' }
   }
@@ -85,8 +86,19 @@ lsp.on_attach(function(client, bufnr)
   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 
 
-  local supported_types = { 'javascriptreact', 'typescriptreact', 'typescript', 'javascript', 'lua', 'go', 'rust',
-    'python', 'kotlin',
+  local supported_types = {
+    -- @TODO: make this a mapping for the ensure_installed so that I don't forget to add things
+    -- in two places
+    'javascriptreact',
+    'typescriptreact',
+    'typescript',
+    'javascript',
+    'lua',
+    'go',
+    'rust',
+    'python',
+    'kotlin',
+    'gleam',
   }
 
   autocmd("BufWritePre", {
@@ -211,7 +223,9 @@ require('mason-lspconfig').setup({
       cmd = { "kotlin-language-server" },
       filetypes = { "kotlin" },
     }),
-    tailwindcss = lspconfig.tailwindcss.setup {},
+    tailwindcss = lspconfig.tailwindcss.setup {
+      filetypes = { "javascriptreact", "typescriptreact", "gleam", "html" }
+    },
     eslint = lspconfig.eslint.setup {
       -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
       -- root_dir = function()
