@@ -25,11 +25,13 @@ local function get_current_function_name()
     -- ^ we can actually use the `arrow_function` type for this instead
     -- @TODO: clean this up, make it check a table or something
     -- ^ have a nested table that's like { 'programming language' = { 'node type', 'node type', 'node type' } }
-    if func:type() == 'function_definition'
-        or func:type() == 'function_declaration'
-        or func:type() == 'arrow_function'
-        or func:type() == 'method_definition'
-        or func:type() == 'class_declaration'
+    local type = func:type()
+    if type == 'function_definition'
+        or type == 'function_declaration'
+        or type == 'arrow_function'
+        or type == 'method_definition'
+        or type == 'class_declaration'
+        or type == 'function'
     then
       break
     end
@@ -57,8 +59,11 @@ local function get_current_function_name()
       local child = node:named_child(i)
       local type = child:type()
 
-      print('node 60: ', type)
-      if type == 'identifier' or type == 'operator_name' or type == 'property_identifier' then
+      -- stuff to do:
+      -- check what is on this line, eg. a ({[<
+      -- maybe add some extra stuff for gleam since the autoformatter works differently than most langs
+      print('node 60: ', type, (ts_utils.get_node_text(child))[1])
+      if type == 'identifier' or type == 'operator_name' or type == 'property_identifier' or type == 'variable_declaration' then
         return (ts_utils.get_node_text(child))[1]
       else
         local name = find_name(child)
@@ -89,16 +94,19 @@ local log_table = {
   python = "print('%s: ', %s)",
   sh = bash_log_str,
   bash = bash_log_str,
-  gleam = "io.print(\"%s: \", %s)",
+  gleam = "io.debug(#(\"%s: \", %s))",
   elixir = "IO.puts(\"%s: \", %s)",
   zig = "std.debug.print(\"%s: %s\", .{ %s })",
 }
 
+local function trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 -- using normal o to open a new line below the current line, and then insert the new text
 -- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
 -- which starts inserting text behind the cursor
--- @TODO: add check for if we're in some kind of object/data structure, and if so, insert the log statement
--- at the end of the object/data structure
+
 vim.keymap.set("n", "<leader>ll", function()
   local filetype = vim.bo.filetype
   local log_cmd = log_table[filetype]
@@ -108,17 +116,27 @@ vim.keymap.set("n", "<leader>ll", function()
   end
   local func_name = get_current_function_name()
   local line_number = vim.api.nvim_win_get_cursor(0)[1]
+  local line_txt = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number + 1, true)[1]
+  local is_complex_type = line_txt:match('[{[(]')
   local symbol = vim.fn.expand('<cword>')
   -- @TODO: change the <cword> to the word under the cursor, and then check if it's a variable or a function
   local new_text = ''
-  if symbol:match("[A-Za-z]") then
-    new_text = string.format(log_cmd, string.format('%s %s', func_name, symbol), symbol)
+  if symbol:match("[A-Za-z0-9]") then
+    -- if func_name is an empty string or just whitespace we want to strip that from the front of the string for better readability
+    new_text = string.format(log_cmd, trim(string.format('%s %s', func_name, symbol)), symbol)
   else
-    new_text = string.format(log_cmd, string.format('%s %s', func_name, line_number + 1), '')
+    new_text = string.format(log_cmd, trim(string.format('%s %s', func_name, line_number + 1)), '')
+  end
+  if is_complex_type then
+    local idx = string.find(line_txt, '[[{(]')
+    vim.cmd("normal! 0")
+    vim.cmd(string.format("normal! %sl", idx))
+    vim.cmd("normal! %")
   end
   vim.cmd(string.format('normal! o%s', new_text))
 
-  if string.sub(log_cmd, -1) == ';' then
+  -- @TODO: having a special case here just for gleam is not good for maintainability... I'll fix this at some point
+  if string.sub(log_cmd, -1) == ';' or filetype == 'gleam' then
     vim.cmd("normal! h")
   end
 
@@ -138,7 +156,7 @@ local plain_log_table = {
   python = "print()",
   sh = plain_bash_log_str,
   bash = plain_bash_log_str,
-  gleam = "io.print()",
+  gleam = "io.debug(#())",
   elixir = "IO.puts()",
   zig = "std.debug.print()",
 }
