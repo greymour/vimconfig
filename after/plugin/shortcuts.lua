@@ -59,8 +59,7 @@ local function get_current_function_name()
       local child = node:named_child(i)
       local type = child:type()
 
-      -- stuff to do:
-      -- check what is on this line, eg. a ({[<
+      -- @TODO:
       -- maybe add some extra stuff for gleam since the autoformatter works differently than most langs
       print('node 60: ', type, (ts_utils.get_node_text(child))[1])
       if type == 'identifier' or type == 'operator_name' or type == 'property_identifier' or type == 'variable_declaration' then
@@ -81,22 +80,22 @@ local function get_current_function_name()
   return prev_function_name
 end
 
-local js_log_str = "console.log('%s: ', %s);"
-local bash_log_str = "echo '%s: ' $%s"
+local js_log_str = { "console.log('%s: ', %s);", 1 }
+local bash_log_str = { "echo '%s: ' $%s", 0 }
 local log_table = {
   javascriptreact = js_log_str,
   typescriptreact = js_log_str,
   typescript = js_log_str,
   javascript = js_log_str,
-  lua = "print('%s: ', %s)",
-  go = "fmt.Printf(\"%s: %%v\", %s)",
-  rust = "println!(\"%s: {:?}\", %s);",
-  python = "print('%s: ', %s)",
+  lua = { "print('%s: ', %s)", 0 },
+  go = { "fmt.Printf(\"%s: %%v\", %s)", 0 },
+  rust = { "println!(\"%s: {:?}\", %s);", 1 },
+  python = { "print('%s: ', %s)", 0 },
   sh = bash_log_str,
   bash = bash_log_str,
-  gleam = "io.debug(#(\"%s: \", %s))",
-  elixir = "IO.puts(\"%s: \", %s)",
-  zig = "std.debug.print(\"%s: %s\", .{ %s })",
+  gleam = { "io.debug(#(\"%s: \", %s))", 1 },
+  elixir = { "IO.puts(\"%s: \", %s)", 0 },
+  zig = { "std.debug.print(\"%s: %s\", .{ %s })", 0 },
 }
 
 local function trim(s)
@@ -107,17 +106,24 @@ end
 -- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
 -- which starts inserting text behind the cursor
 
+-- @TODO: clean this up, this is very messy
 vim.keymap.set("n", "<leader>ll", function()
   local filetype = vim.bo.filetype
-  local log_cmd = log_table[filetype]
+  local log_tbl = log_table[filetype]
+  local log_cmd = log_tbl[1]
   if type(log_cmd) ~= 'string' then
     print("no log for this filetype: ", filetype)
     return
   end
   local func_name = get_current_function_name()
   local line_number = vim.api.nvim_win_get_cursor(0)[1]
-  local line_txt = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number + 1, true)[1]
-  local is_complex_type = line_txt:match('[{[(]')
+  local line_txt = trim(vim.api.nvim_buf_get_lines(0, line_number - 1, line_number + 1, true)[1])
+  local line_length = #line_txt
+  local check_next_line = line_txt:sub(line_length, line_length) == '='
+  if (check_next_line) then
+    line_txt = vim.api.nvim_buf_get_lines(0, line_number, line_number + 1, true)[1]
+  end
+  local is_complex_type = type(line_txt:match('[{[(]')) == 'string'
   local symbol = vim.fn.expand('<cword>')
   -- @TODO: change the <cword> to the word under the cursor, and then check if it's a variable or a function
   local new_text = ''
@@ -128,49 +134,52 @@ vim.keymap.set("n", "<leader>ll", function()
     new_text = string.format(log_cmd, trim(string.format('%s %s', func_name, line_number + 1)), '')
   end
   if is_complex_type then
-    local idx = string.find(line_txt, '[[{(]')
+    local idx = (string.find(line_txt, '[[{(]') or 1) - 1
+    if check_next_line then
+      vim.cmd("normal! j")
+    end
     vim.cmd("normal! 0")
     vim.cmd(string.format("normal! %sl", idx))
     vim.cmd("normal! %")
   end
   vim.cmd(string.format('normal! o%s', new_text))
 
-  -- @TODO: having a special case here just for gleam is not good for maintainability... I'll fix this at some point
-  if string.sub(log_cmd, -1) == ';' or filetype == 'gleam' then
-    vim.cmd("normal! h")
+  if log_tbl[2] ~= 0 then
+    vim.cmd(string.format("normal! %sh", log_tbl[2]))
   end
 
   vim.cmd("startinsert")
 end)
 
-local plain_js_log_str = "console.log();"
-local plain_bash_log_str = "echo "
+local plain_js_log_str = { "console.log();", 1 }
+local plain_bash_log_str = { "echo ", 0 }
 local plain_log_table = {
   javascriptreact = plain_js_log_str,
   typescriptreact = plain_js_log_str,
   typescript = plain_js_log_str,
   javascript = plain_js_log_str,
-  lua = "print()",
-  go = "fmt.Printf()",
-  rust = "println!();",
-  python = "print()",
+  lua = { "print()", 0 },
+  go = { "fmt.Printf()", 0 },
+  rust = { "println!();", 1 },
+  python = { "print()", 0 },
   sh = plain_bash_log_str,
   bash = plain_bash_log_str,
-  gleam = "io.debug(#())",
-  elixir = "IO.puts()",
-  zig = "std.debug.print()",
+  gleam = { "io.debug(#())", 1 },
+  elixir = { "IO.puts()", 0 },
+  zig = { "std.debug.print()", 0 },
 }
 
 vim.keymap.set("n", "<leader>il", function()
   local filetype = vim.bo.filetype
-  local log_cmd = plain_log_table[filetype]
+  local log_tbl = plain_log_table[filetype]
+  local log_cmd = log_tbl[1]
   if type(log_cmd) ~= 'string' then
     print("no log for this filetype: ", filetype)
     return
   end
   vim.cmd(string.format('normal! o%s', log_cmd))
-  if string.sub(log_cmd, -1) == ';' then
-    vim.cmd("normal! h")
+  if log_tbl[2] ~= 0 then
+    vim.cmd(string.format("normal! %sh", log_tbl[2]))
   end
 
   vim.cmd("startinsert")
