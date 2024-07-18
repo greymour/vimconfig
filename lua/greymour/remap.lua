@@ -34,6 +34,8 @@ vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
 -- Control C exits insert mode
 vim.keymap.set("i", "<C-c>", "<Esc>")
+-- Esc leaves terminal insert mode
+vim.keymap.set("t", "<Esc>", "<C-\\><C-N>")
 
 vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
