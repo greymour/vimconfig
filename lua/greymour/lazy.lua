@@ -147,11 +147,12 @@ local plugins = {
       })
     end
   },
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} }
 }
 
--- if this returns '/' then we're on macos, which means it's my work laptop
-if package.config:sub(1, 1) == '/' then
-  table.insert(plugins, { 'github/copilot.vim' })
-end
+-- -- if this returns '/' then we're on macos, which means it's my work laptop
+-- -- if package.config:sub(1, 1) == '/' then
+-- --   table.insert(plugins, { 'github/copilot.vim', config = function() vim.cmd('normal! :Copilot disable') end })
+-- end
 
 require("lazy").setup(plugins)
