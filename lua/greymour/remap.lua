@@ -107,6 +107,14 @@ vim.keymap.set({ 'v', 'n' }, '<leader>/', function()
   vim.api.nvim_win_set_cursor(0, { start_line, 0 })
   local step_cmd = "j"
   local end_step = "k"
+
+  -- special handling for Golang. I could make some kind of "get_starting_column" function that abstracts this but
+  -- go is the only language that I've had this issue with so far
+  local is_go = file_type == 'go'
+  if is_go and start_col > 0 then
+    start_col = start_col - 1
+  end
+
   local adding_comments = string.sub(string.gsub(line_str, "%s+", ""), 1, comment_len) ~= comment
   if adding_comments then
     vim.cmd("normal! ^")
