@@ -147,7 +147,13 @@ local plugins = {
       })
     end
   },
-  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} }
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
+  {
+    'xemptuous/sqlua.nvim',
+    lazy = true,
+    cmd = 'SQLua',
+    config = function() require('sqlua').setup() end
+  },
 }
 
 -- -- if this returns '/' then we're on macos, which means it's my work laptop

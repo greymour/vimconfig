@@ -2,6 +2,42 @@
 -- @TODO: clean up this code I stole from the internet
 local ts_utils = require 'nvim-treesitter.ts_utils'
 
+local function_identifiers = {
+  'function_definition',
+  'function_declaration',
+  'arrow_function',
+  'method_definition',
+  'class_declaration',
+  'function',
+}
+
+local function get_function_type(node)
+  for _, ident in pairs(function_identifiers) do
+    if ident == node:type() then
+      return node:type()
+    end
+  end
+  return nil
+end
+
+local function get_arrow_function_name(func)
+  func = func:parent()
+  local func_type = get_function_type(func)
+  if func_type == nil then
+    while func_type == nil and func:parent() ~= nil do
+      func = func:parent()
+      func_type = get_function_type(func)
+    end
+  end
+  print('test: ', func:type(), func)
+  -- this looks something like `useInsuranceLookupData = () => {`
+  local func_str = ts_utils.get_node_text(func)[1]
+  local func_name = func_str:match('[^=]*')
+  print('get_current_function_name func_name: ', func_name)
+  return Trim(func_name)
+end
+
+
 local function get_current_function_name()
   local prev_function_node = nil
   local prev_function_name = ""
@@ -18,21 +54,23 @@ local function get_current_function_name()
 
   while func do
     -- debug statement, use for checking what node types are getting iterated over
-    print('get_current_function_name: ', func:type(), ts_utils.get_node_text(func)[1])
+    -- print('get_current_function_name: ', func:type(), ts_utils.get_node_text(func)[1])
     -- original code just checked for `function_definition` but it seems like there's multiple types of function nodes
     -- in treesitter
-    -- 'lexical_declaration' is required for javascript arrow functions assigned to variables
-    -- ^ we can actually use the `arrow_function` type for this instead
     -- @TODO: clean this up, make it check a table or something
     -- ^ have a nested table that's like { 'programming language' = { 'node type', 'node type', 'node type' } }
-    local type = func:type()
-    if type == 'function_definition'
-        or type == 'function_declaration'
-        or type == 'arrow_function'
-        or type == 'method_definition'
-        or type == 'class_declaration'
-        or type == 'function'
-    then
+    local ident = get_function_type(func)
+    if type(ident) == 'string' then
+      -- arrow functions in JS are a special case
+      if ident == 'arrow_function' then
+        func = func:parent()
+        print('test: ', get_function_type(func))
+        -- this looks something like `useInsuranceLookupData = () => {`
+        local func_str = ts_utils.get_node_text(func)[1]
+        local func_name = func_str:match('[^=]*')
+        print('get_current_function_name func_name: ', func_name)
+        return Trim(func_name)
+      end
       break
     end
 

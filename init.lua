@@ -12,3 +12,7 @@ function Dump(o)
     return tostring(o)
   end
 end
+
+function Trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
