@@ -114,7 +114,7 @@ end)
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = {
-    'ts_ls',
+    'tsserver',
     'rust_analyzer',
     'eslint',
     -- 'pyright',
@@ -130,6 +130,8 @@ require('mason-lspconfig').setup({
     'sqlls',
     'astro',
     'tailwindcss',
+    'denols',
+    'hls',
   },
   handlers = {
     lsp.default_setup,
@@ -233,7 +235,11 @@ require('mason-lspconfig').setup({
       -- end,
       useFlatConfig = true,
     },
-    gleam = lspconfig.gleam.setup {}
+    gleam = lspconfig.gleam.setup {},
+    denols = lspconfig.denols.setup {},
+    hls = lspconfig.hls.setup {
+      filetypes = { 'haskell', 'lhaskell', 'cabal' },
+    },
   }
 })
 
