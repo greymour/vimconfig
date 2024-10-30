@@ -127,7 +127,7 @@ require('mason-lspconfig').setup({
     'lua_ls',
     'pylsp',
     'kotlin_language_server',
-    'sqlls',
+    -- 'sqlls',
     'astro',
     'tailwindcss',
     'denols',
@@ -236,10 +236,16 @@ require('mason-lspconfig').setup({
       useFlatConfig = true,
     },
     gleam = lspconfig.gleam.setup {},
-    denols = lspconfig.denols.setup {},
     hls = lspconfig.hls.setup {
       filetypes = { 'haskell', 'lhaskell', 'cabal' },
     },
+    ts_ls = lspconfig.ts_ls.setup {
+      root_dir = lspconfig.util.root_pattern("package.json"),
+      single_file_support = false
+    },
+    denols = lspconfig.denols.setup {
+      root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+    }
   }
 })
 

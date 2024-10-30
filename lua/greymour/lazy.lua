@@ -148,11 +148,27 @@ local plugins = {
     end
   },
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
+  { 'tpope/vim-dadbod' },
+  -- { 'kristijanhusak/vim-dadbod-completion' },
   {
-    'xemptuous/sqlua.nvim',
-    lazy = true,
-    cmd = 'SQLua',
-    config = function() require('sqlua').setup() end
+    'kristijanhusak/vim-dadbod-ui',
+    dependencies = {
+      { 'tpope/vim-dadbod' },
+      -- { 'kristijanhusak/vim-dadbod-completion', }
+    },
+    cmd = {
+      'DBUI',
+      'DBUIToggle',
+      'DBUIAddConnection',
+      'DBUIFindBuffer',
+    },
+    init = function()
+      -- Your DBUI configuration
+      vim.g.db_ui_use_nerd_fonts = 0
+      vim.g.dbs = {
+        { name = 'treecko', url = 'postgres://treecko@localhost:10000/treecko' },
+      }
+    end,
   },
 }
 
