@@ -66,6 +66,15 @@ autocmd("BufWritePre", {
   end
 })
 
+-- idk how to make this work, whatever
+-- autocmd("BufWritePre", {
+--   pattern = { '*.kt', '*.kts' },
+--   callback = function()
+--     vim.cmd("%! ktlint --format")
+--   end
+-- })
+
+
 vim.lsp.buf.format {
   filter = function(client)
     return client.name ~= "yamlls" and client.name ~= "marksman"
@@ -99,6 +108,7 @@ lsp.on_attach(function(client, bufnr)
     'python',
     'kotlin',
     'gleam',
+    'haskell',
   }
 
   autocmd("BufWritePre", {
@@ -114,7 +124,7 @@ end)
 require('mason').setup({})
 require('mason-lspconfig').setup({
   ensure_installed = {
-    'tsserver',
+    'ts_ls',
     'rust_analyzer',
     'eslint',
     -- 'pyright',

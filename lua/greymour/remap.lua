@@ -54,13 +54,15 @@ vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
 local dbl_slash = '//'
 local hash = '#'
+-- calling this dash_dash because having dbl_slash and dbl_dash was confusing
+local dash_dash = '--'
 
 local comment_table = {
   javascriptreact = dbl_slash,
   typescriptreact = dbl_slash,
   typescript = dbl_slash,
   javascript = dbl_slash,
-  lua = '--',
+  lua = dash_dash,
   go = dbl_slash,
   rust = dbl_slash,
   python = hash,
@@ -75,6 +77,8 @@ local comment_table = {
   yaml = hash,
   css = '/* */',
   gleam = dbl_slash,
+  haskell = dash_dash,
+  kotlin = dbl_slash,
 }
 
 
