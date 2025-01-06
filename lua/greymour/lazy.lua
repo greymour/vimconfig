@@ -23,18 +23,11 @@ local plugins = {
     'marko-cerovac/material.nvim',
     lazy = false,
     priority = 1000,
-    config = function()
-      vim.g.material_style = "palenight"
-      vim.cmd 'colorscheme material'
-      -- sets all line numbers to white with a blue-purple background, need this to make set the current line number's
-      -- colour when editing a file
-      vim.cmd ':hi LineNr guibg=#7253c6 guifg=#ffffff'
-      -- this changes the line number colour in netrw
-      vim.cmd ':hi CursorLineNr guibg=#7253c6 guifg=#ffffff'
-      -- overrides the LineNr setting for lines above and below the current line to an off-white
-      vim.cmd ':hi LineNrAbove guibg=none guifg=#bfbfbf'
-      vim.cmd ':hi LineNrBelow guibg=none guifg=#bfbfbf'
-    end
+  },
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000
   },
   {
     "hrsh7th/nvim-cmp",
