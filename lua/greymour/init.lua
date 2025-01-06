@@ -44,12 +44,6 @@ local function set_line_nr_colours(current_line, other_lines)
   vim.cmd('hi LineNrBelow guibg=' .. other_lines[1] .. ' guifg=' .. other_lines[2])
 end
 
--- local function setup_material_theme()
---   vim.g.material_style = "palenight"
---   vim.cmd 'colorscheme material'
---   set_line_nr_colours({ '#7253c6', '#ffffff' }, { 'none', '#bfbfbf' })
--- end
-
 local function setup_catppuccin()
   vim.cmd 'colorscheme catppuccin-mocha'
   set_line_nr_colours({ '#7253c6', '#ffffff' }, { 'none', '#bfbfbf' })
