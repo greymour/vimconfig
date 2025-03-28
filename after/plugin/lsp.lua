@@ -135,12 +135,13 @@ require('mason-lspconfig').setup({
     'cssls',
     'marksman',
     'lua_ls',
-    'pylsp',
+    -- 'pylsp',
+    'basedpyright',
     'kotlin_language_server',
     -- 'sqlls',
     'astro',
     'tailwindcss',
-    'denols',
+    -- 'denols',
     'hls',
   },
   handlers = {
@@ -153,6 +154,17 @@ require('mason-lspconfig').setup({
           }
         }
       }
+    },
+    basedpyright = lspconfig.basedpyright.setup {
+      -- settings = {
+      --   basedpyright = {
+      --     analysis = {
+      --       autoSearchPaths = true,
+      --       useLibraryCodeForTypes = true,
+      --       diagnosticMode = "workspace",
+      --     }
+      --   }
+      -- }
     },
     -- pylsp with mypy seems to be working fine after restarting the terminal, so will continue using that
     -- setup; if I get the freeze on save issue again, will try switching back
@@ -182,42 +194,62 @@ require('mason-lspconfig').setup({
     --  working fine now
     --
     --  Have to install mypy to get type checking with pylsp, instead of needing something like pyright.
-    pylsp = function()
-      lspconfig.pylsp.setup({
-        settings = {
-          pylsp = {
-            configurationSources = { "flake8" },
-            plugins = {
-              pycodestyle = {
-                enabled = false,
-              },
-              mccabe = {
-                enabled = false
-              },
-              pyflakes = {
-                enabled = false
-              },
-              pylint = {
-                enabled = false
-              },
-              flake8 = {
-                enabled = true,
-                --maxLineLength = 120,
-              },
-              autopep8 = {
-                enabled = true,
-              },
-              yapf = {
-                enabled = false,
-              },
-              isort = {
-                enabled = false,
-              },
-            }
-          },
-        }
-      })
-    end,
+    --  documenting some shit:
+    --  - things seem to be working again now
+    --  - do NOT install flake8 as a plugin to pylsp, it breaks... everything!
+    --  - a lot of weirdness with mypy for type checking, unsure which venv it's actually using for the types
+    --  - may need to install mypy into the venv that I'm using to run a specific project
+    --  - something is fucked with Pydantic + mypy, yayyyyyy!
+    --  -^ the problem here was that mypy doesn't type check the body of functions without type hints in the function
+    --  signature AT ALL, so I needed to add settings.pylsp.plugins.pylsp_mypy.config.checked_untyped_defs = true
+    --  -^ I should look into some other stuff w/ mypy, see if I can point it at the correct venv
+    --  -^ looks like there's a mix of parsing libs installed in the current project venv as well as stubs in... somewhere!
+    --  -^ might still need pyright for the things I want :((((((
+    --  ^ OKAY: I need the stubs installed in the venv for the individual project, this is important to know
+    -- pylsp = function()
+    --   lspconfig.pylsp.setup({
+    --     root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+    --     settings = {
+    --       pylsp = {
+    --         configurationSources = { "flake8" },
+    --         plugins = {
+    --           pycodestyle = {
+    --             enabled = false,
+    --           },
+    --           mccabe = {
+    --             enabled = false
+    --           },
+    --           pyflakes = {
+    --             enabled = false
+    --           },
+    --           pylint = {
+    --             enabled = false
+    --           },
+    --           flake8 = {
+    --             enabled = true,
+    --           },
+    --           autopep8 = {
+    --             enabled = true,
+    --           },
+    --           yapf = {
+    --             enabled = false,
+    --           },
+    --           isort = {
+    --             enabled = false,
+    --           },
+    --           -- pylsp_mypy = {
+    --           --   enabled = true,
+    --           --   config = {
+    --           --     strict = true,
+    --           --     follow_imports = true,
+    --           --     check_untyped_defs = true,
+    --           --   }
+    --           -- },
+    --         }
+    --       },
+    --     }
+    --   })
+    -- end,
     bashls = lspconfig.bashls.setup({
       cmd = { "bash-language-server", "start" },
       filetypes = { "sh", "zsh", "bash", ".bashrc" },
@@ -253,9 +285,9 @@ require('mason-lspconfig').setup({
       root_dir = lspconfig.util.root_pattern("package.json"),
       single_file_support = false
     },
-    denols = lspconfig.denols.setup {
-      root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
-    }
+    -- denols = lspconfig.denols.setup {
+    --   root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+    -- }
   }
 })
 
