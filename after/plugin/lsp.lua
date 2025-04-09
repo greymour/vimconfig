@@ -249,8 +249,8 @@ require('mason-lspconfig').setup({
     hls = lspconfig.hls.setup {
       filetypes = { 'haskell', 'lhaskell', 'cabal' },
     },
-    ts_ls = lspconfig.ts_ls.setup {
-      root_dir = lspconfig.util.root_pattern("package.json"),
+    tsserver = lspconfig.tsserver.setup {
+      root_dir = lspconfig.util.root_pattern("tsconfig.json"),
       single_file_support = false
     },
     denols = lspconfig.denols.setup {
