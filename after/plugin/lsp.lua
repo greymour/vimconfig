@@ -46,6 +46,8 @@ lsp.set_preferences({
   }
 })
 -- @NOTE re: styled components:
+-- @NOTENOTE: this is only required when using the template literal syntax for styled components. If using the object
+-- syntax, this isn't necessary (I think)
 -- To get autocompletion/LSP support in styled-components, follow the Visual Studio instructions
 -- here: https://github.com/styled-components/typescript-styled-plugin?tab=readme-ov-file#with-visual-studio
 -- and then run `TSInstall css` in the nvim command line to get syntax highlighting
@@ -53,18 +55,19 @@ lsp.set_preferences({
 -- I might be able to get this working w/o needing to install the plugin into the project and instead use a global
 -- config, but I haven't been able to get that to work yet, and it's not worth the time
 
-autocmd("BufWritePre", {
-  pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
-  callback = function()
-    -- this makes it so that if eslint isn't installed in a project, we don't get an error on every save
-    if vim.fn.exists(':EslintFixAll') > 0 then
-      vim.cmd("EslintFixAll")
-    end
-    if vim.fn.exists(':Prettier') > 0 then
-      vim.cmd('Prettier')
-    end
-  end
-})
+-- @TODO: disabling this for now
+-- autocmd("BufWritePre", {
+--   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+--   callback = function()
+--     -- this makes it so that if eslint isn't installed in a project, we don't get an error on every save
+--     if vim.fn.exists(':EslintFixAll') > 0 then
+--       vim.cmd("EslintFixAll")
+--     end
+--     if vim.fn.exists(':Prettier') > 0 then
+--       vim.cmd('Prettier')
+--     end
+--   end
+-- })
 
 -- idk how to make this work, whatever
 -- autocmd("BufWritePre", {
@@ -77,7 +80,7 @@ autocmd("BufWritePre", {
 
 vim.lsp.buf.format {
   filter = function(client)
-    return client.name ~= "yamlls" and client.name ~= "marksman"
+    return client.name ~= "yamlls" and client.name ~= "marksman" -- and client.name ~= "eslint_d"
   end
 }
 
@@ -126,7 +129,7 @@ require('mason-lspconfig').setup({
   ensure_installed = {
     'ts_ls',
     'rust_analyzer',
-    'eslint',
+    -- 'eslint_d',
     -- 'pyright',
     'gopls',
     'jsonls',
@@ -135,13 +138,16 @@ require('mason-lspconfig').setup({
     'cssls',
     'marksman',
     'lua_ls',
-    'pylsp',
+    -- 'pylsp',
     'kotlin_language_server',
     -- 'sqlls',
     'astro',
     'tailwindcss',
     'denols',
     'hls',
+    'biome',
+    'graphql',
+    'yamlls',
   },
   handlers = {
     lsp.default_setup,
@@ -238,29 +244,72 @@ require('mason-lspconfig').setup({
     tailwindcss = lspconfig.tailwindcss.setup {
       filetypes = { "javascriptreact", "typescriptreact", "gleam", "html" }
     },
-    eslint = lspconfig.eslint.setup {
-      -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
-      -- root_dir = function()
-      --   return vim.fs.dirname(vim.fs.find({ 'eslint.config.mjs' }, { upward = true })[1])
-      -- end,
-      useFlatConfig = true,
-    },
+    -- eslint_d = lspconfig.eslint_d.setup {
+    --   -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+    --   -- root_dir = function()
+    --   --   return vim.fs.dirname(vim.fs.find({ 'eslint.config.mjs' }, { upward = true })[1])
+    --   -- end,
+    --   useFlatConfig = true,
+    --   autoFixOnSave = false,
+    -- },
+    biome = function()
+      lspconfig.biome.setup {}
+    end,
     gleam = lspconfig.gleam.setup {},
     hls = lspconfig.hls.setup {
       filetypes = { 'haskell', 'lhaskell', 'cabal' },
     },
-    tsserver = lspconfig.tsserver.setup {
+    ts_ls = lspconfig.ts_ls.setup {
       root_dir = lspconfig.util.root_pattern("tsconfig.json"),
-      single_file_support = false
+      single_file_support = false,
+      settings = {
+        typescript = {
+          tsserver = {
+            maxTsServerMemory = 24000,
+            nodePath = "node",
+          }
+        }
+      },
     },
     denols = lspconfig.denols.setup {
       root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
-    }
+    },
+    graphql = lspconfig.graphql.setup {
+      -- root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json", "graphql.config.js"),
+      filetypes = {
+        "javascriptreact",
+        "typescriptreact",
+        "javascript",
+        "typescript",
+        "graphql"
+      }
+    },
   }
 })
 
-lspconfig.gleam.setup {}
+-- lspconfig.gleam.setup {}
 
 vim.diagnostic.config({
   virtual_text = true
+})
+
+vim.env.ESLINT_D_PPID = vim.fn.getpid()
+local js_linters = { 'eslint_d', 'biomejs' }
+require('lint').linters_by_ft = {
+  javascript = js_linters,
+  typescript = js_linters,
+  javascriptreact = js_linters,
+  typescriptreact = js_linters,
+}
+
+autocmd({ "BufWritePre" }, {
+  callback = function()
+    -- try_lint without arguments runs the linters defined in `linters_by_ft`
+    -- for the current filetype
+    require("lint").try_lint()
+
+    -- You can call `try_lint` with a linter name or a list of names to always
+    -- run specific linters, independent of the `linters_by_ft` configuration
+    require("lint").try_lint("cspell")
+  end,
 })

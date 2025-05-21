@@ -140,6 +140,15 @@ local function trim(s)
   return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+local function get_line_number()
+  return vim.api.nvim_win_get_cursor(0)[1]
+end
+
+local function get_filename()
+  -- https://neovim.io/doc/user/builtin.html#expand()
+  return vim.fn.expand("%:t:r")
+end
+
 -- using normal o to open a new line below the current line, and then insert the new text
 -- if the log type ends with a semicolon, move the cursor back one character, and then start insert mode
 -- which starts inserting text behind the cursor
@@ -154,7 +163,7 @@ vim.keymap.set("n", "<leader>ll", function()
     return
   end
   local func_name = get_current_function_name()
-  local line_number = vim.api.nvim_win_get_cursor(0)[1]
+  local line_number = get_line_number()
   local line_txt = trim(vim.api.nvim_buf_get_lines(0, line_number - 1, line_number + 1, true)[1])
   local line_length = #line_txt
   local check_next_line = line_txt:sub(line_length, line_length) == '='
@@ -221,4 +230,102 @@ vim.keymap.set("n", "<leader>il", function()
   end
 
   vim.cmd("startinsert")
+end)
+
+local function is_valid_graphql_filetype()
+  local filetype = vim.bo.filetype
+  return vim.tbl_contains({ 'javascriptreact', 'typescriptreact', 'javascript', 'typescript' }, filetype)
+end
+
+local function get_graphql_fragment_name()
+  local symbol = ''
+  vim.ui.input({ prompt = 'Fragment name: ' }, function(input)
+    symbol = input
+  end)
+  return symbol
+end
+
+-- prompts the user for input and creates a Relay-compliant GraphQL fragment definition
+vim.keymap.set("n", "<leader>cff", function()
+  if not is_valid_graphql_filetype() then
+    return
+  end
+  local symbol = get_graphql_fragment_name()
+  if type(symbol) ~= 'string' then
+    return
+  end
+
+  local line_number = get_line_number()
+  local filename = get_filename()
+  vim.api.nvim_buf_set_lines(0, line_number - 1, line_number - 1, false, {
+    string.format('const %s%sFragment = graphql`', filename, symbol),
+    string.format('\tfragment %s%sFragment on %s {', filename, symbol, symbol),
+    '\t}',
+    '`;',
+  })
+  vim.cmd('normal! 2k')
+end)
+
+-- prompts the user for input and creates a Relay-compliant GraphQL fragment definition with arguments
+vim.keymap.set("n", "<leader>cfa", function()
+  if not is_valid_graphql_filetype() then
+    return
+  end
+  local symbol = get_graphql_fragment_name()
+  if type(symbol) ~= 'string' then
+    return
+  end
+
+  local line_number = get_line_number()
+  vim.api.nvim_buf_set_lines(0, line_number - 1, line_number - 1, false, {
+    string.format('const %sFragment = graphql`', symbol),
+    string.format('\tfragment %sFragment on %s', symbol, symbol),
+    '\t@argumentDefinitions(',
+    '\t)',
+    '\t{',
+    '\t}',
+    '`;',
+  })
+  vim.cmd('normal! 4k')
+end)
+
+-- prompts the user for input and creates a Relay-compliant GraphQL query definition
+vim.keymap.set("n", "<leader>cqq", function()
+  if not is_valid_graphql_filetype() then
+    return
+  end
+  local symbol = get_graphql_fragment_name()
+  if type(symbol) ~= 'string' then
+    return
+  end
+  local line_number = get_line_number()
+  local filename = get_filename()
+
+  vim.api.nvim_buf_set_lines(0, line_number - 1, line_number - 1, false, {
+    string.format('const %s%sQuery = graphql`', filename, symbol),
+    string.format('\tquery %s%sQuery {', filename, symbol, symbol),
+    '\t}',
+    '`;',
+  })
+  vim.cmd('normal! 4k')
+end)
+
+vim.keymap.set("n", "<leader>cfm", function()
+  if not is_valid_graphql_filetype() then
+    return
+  end
+  local symbol = get_graphql_fragment_name()
+  if type(symbol) ~= 'string' then
+    return
+  end
+
+  local line_number = get_line_number()
+  vim.api.nvim_buf_set_lines(0, line_number - 1, line_number - 1, false, {
+    string.format('const %sMutation = graphql`', symbol),
+    string.format('\tmutation %sMutation(', symbol),
+    '\t) {',
+    '\t}',
+    '`;',
+  })
+  vim.cmd('normal! 4k')
 end)
