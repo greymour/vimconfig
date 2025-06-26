@@ -29,20 +29,20 @@ local plugins = {
     name = "catppuccin",
     priority = 1000
   },
-  {
-    "hrsh7th/nvim-cmp",
-    -- load cmp on InsertEnter
-    event = "InsertEnter",
-    -- these dependencies will only be loaded when cmp loads
-    -- dependencies are always lazy-loaded unless specified otherwise
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-    },
-    config = function()
-      -- ...
-    end,
-  },
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   -- load cmp on InsertEnter
+  --   event = "InsertEnter",
+  --   -- these dependencies will only be loaded when cmp loads
+  --   -- dependencies are always lazy-loaded unless specified otherwise
+  --   dependencies = {
+  --     "hrsh7th/cmp-nvim-lsp",
+  --     "hrsh7th/cmp-buffer",
+  --   },
+  --   config = function()
+  --     -- ...
+  --   end,
+  -- },
   {
     "folke/trouble.nvim",
     opts = {},
@@ -80,14 +80,6 @@ local plugins = {
       },
     },
   },
-  -- config = function()
-  --   require("trouble").setup {
-  --     icons = false,
-  --     -- your configuration comes here
-  --     -- or leave it empty to use the default settings
-  --     -- refer to the configuration section below
-  --   }
-  -- end
   -- to get syntax highlighting for styled-components, run TSInstall css
   {
     'nvim-treesitter/nvim-treesitter',
@@ -105,34 +97,17 @@ local plugins = {
   -- I never use undotree so commenting out
   --  "mbbill/undotree"
   { "tpope/vim-fugitive" },
+  { 'neovim/nvim-lspconfig' },
   { "nvim-treesitter/nvim-treesitter-context" },
   {
-    'VonHeikemen/lsp-zero.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      -- LSP Support
-      { 'neovim/nvim-lspconfig' },
-      { 'williamboman/mason.nvim' },
-      { 'williamboman/mason-lspconfig.nvim' },
-
-      -- Autocompletion
-      { 'hrsh7th/nvim-cmp' },
-      { 'hrsh7th/cmp-buffer' },
-      { 'hrsh7th/cmp-path' },
-      { 'saadparwaiz1/cmp_luasnip' },
-      { 'hrsh7th/cmp-nvim-lsp' },
-      { 'hrsh7th/cmp-nvim-lua' },
-
-      -- Snippets
-      { 'L3MON4D3/LuaSnip' },
-      { 'rafamadriz/friendly-snippets' },
-    }
+    'williamboman/mason.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {},
+    -- dependencies = {
+    --   "graphql-language-service-cli", -- required for graphql-lsp
+    -- },
   },
-  -- {
-  --   'williamboman/mason.nvim',
-  --     dependencies = {
-  --       "graphql-language-service-cli", -- required for graphql-lsp
-  -- },
   {
     'lewis6991/gitsigns.nvim',
     config = function() require('gitsigns').setup() end
@@ -170,15 +145,15 @@ local plugins = {
     'virchau13/tree-sitter-astro',
     dependencies = { 'nvim-treesitter/nvim-treesitter' }
   },
-  {
-    "roobert/tailwindcss-colorizer-cmp.nvim",
-    -- optionally, override the default options:
-    config = function()
-      require("tailwindcss-colorizer-cmp").setup({
-        color_square_width = 2,
-      })
-    end
-  },
+  -- {
+  --   "roobert/tailwindcss-colorizer-cmp.nvim",
+  --   -- optionally, override the default options:
+  --   config = function()
+  --     require("tailwindcss-colorizer-cmp").setup({
+  --       color_square_width = 2,
+  --     })
+  --   end
+  -- },
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   { 'tpope/vim-dadbod' },
   -- { 'kristijanhusak/vim-dadbod-completion' },
@@ -202,13 +177,8 @@ local plugins = {
       }
     end,
   },
-  { 'mfussenegger/nvim-lint' }
+  { 'mfussenegger/nvim-lint' },
   -- { 'mfussenegger/nvim-dap' }
 }
-
--- -- if this returns '/' then we're on macos, which means it's my work laptop
--- -- if package.config:sub(1, 1) == '/' then
--- --   table.insert(plugins, { 'github/copilot.vim', config = function() vim.cmd('normal! :Copilot disable') end })
--- end
 
 require("lazy").setup(plugins)

@@ -222,3 +222,7 @@ vim.keymap.set("i", "<C-BS>", "<C-w>")
 
 -- I hate having to type :messages constantly when debugging my shit
 vim.keymap.set("n", "<leader>mm", "<cmd>:messages<CR>")
+
+vim.keymap.set('i', '<c-space>', function()
+  vim.lsp.completion.get()
+end)

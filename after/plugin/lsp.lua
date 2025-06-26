@@ -1,315 +1,315 @@
-local lsp = require("lsp-zero")
-local lspconfig = require('lspconfig')
-local autocmd = vim.api.nvim_create_autocmd
+-- local lsp = require("lsp-zero")
+-- local lspconfig = require('lspconfig')
+-- local autocmd = vim.api.nvim_create_autocmd
 
-lsp.preset("recommended")
+-- lsp.preset("recommended")
 
-local cmp = require('cmp')
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<CR>'] = cmp.mapping.confirm({ select = false }),
-  ['<S-Space>'] = cmp.mapping.abort(),
-  ['<C-Space>'] = cmp.mapping.complete(),
-})
-
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
-
-cmp.setup({
-  -- add these back in if I decide I want bordered windows (need to pass in a few other options as well)
-  --  window = {
-  --    completion = cmp.config.window.bordered(),
-  --    documentation = cmp.config.window.bordered(),
-  --  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
-    ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
-    ['<CR>'] = cmp.mapping.confirm({ select = false }),
-    ['<S-Space>'] = cmp.mapping.abort(),
-    ['<C-Space>'] = cmp.mapping.complete(),
-  }),
-  preselect = cmp.PreselectMode.None,
-  sources = {
-    { name = 'nvim_lsp' }
-  }
-})
-
-lsp.set_preferences({
-  suggest_lsp_servers = true,
-  sign_icons = {
-    error = 'E',
-    warn = 'W',
-    hint = 'H',
-    info = 'I'
-  }
-})
--- @NOTE re: styled components:
--- @NOTENOTE: this is only required when using the template literal syntax for styled components. If using the object
--- syntax, this isn't necessary (I think)
--- To get autocompletion/LSP support in styled-components, follow the Visual Studio instructions
--- here: https://github.com/styled-components/typescript-styled-plugin?tab=readme-ov-file#with-visual-studio
--- and then run `TSInstall css` in the nvim command line to get syntax highlighting
---
--- I might be able to get this working w/o needing to install the plugin into the project and instead use a global
--- config, but I haven't been able to get that to work yet, and it's not worth the time
-
--- @TODO: disabling this for now
--- autocmd("BufWritePre", {
---   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
---   callback = function()
---     -- this makes it so that if eslint isn't installed in a project, we don't get an error on every save
---     if vim.fn.exists(':EslintFixAll') > 0 then
---       vim.cmd("EslintFixAll")
---     end
---     if vim.fn.exists(':Prettier') > 0 then
---       vim.cmd('Prettier')
---     end
---   end
+-- local cmp = require('cmp')
+-- local cmp_select = { behavior = cmp.SelectBehavior.Select }
+-- local cmp_mappings = lsp.defaults.cmp_mappings({
+--   ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
+--   ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
+--   ['<CR>'] = cmp.mapping.confirm({ select = false }),
+--   ['<S-Space>'] = cmp.mapping.abort(),
+--   ['<C-Space>'] = cmp.mapping.complete(),
 -- })
 
--- idk how to make this work, whatever
--- autocmd("BufWritePre", {
---   pattern = { '*.kt', '*.kts' },
---   callback = function()
---     vim.cmd("%! ktlint --format")
---   end
+-- cmp_mappings['<Tab>'] = nil
+-- cmp_mappings['<S-Tab>'] = nil
+
+-- cmp.setup({
+--   -- add these back in if I decide I want bordered windows (need to pass in a few other options as well)
+--   --  window = {
+--   --    completion = cmp.config.window.bordered(),
+--   --    documentation = cmp.config.window.bordered(),
+--   --  },
+--   mapping = cmp.mapping.preset.insert({
+--     ['<C-k>'] = cmp.mapping.select_prev_item(cmp_select),
+--     ['<C-j>'] = cmp.mapping.select_next_item(cmp_select),
+--     ['<CR>'] = cmp.mapping.confirm({ select = false }),
+--     ['<S-Space>'] = cmp.mapping.abort(),
+--     ['<C-Space>'] = cmp.mapping.complete(),
+--   }),
+--   preselect = cmp.PreselectMode.None,
+--   sources = {
+--     { name = 'nvim_lsp' }
+--   }
 -- })
 
+-- lsp.set_preferences({
+--   suggest_lsp_servers = true,
+--   sign_icons = {
+--     error = 'E',
+--     warn = 'W',
+--     hint = 'H',
+--     info = 'I'
+--   }
+-- })
+-- -- @NOTE re: styled components:
+-- -- @NOTENOTE: this is only required when using the template literal syntax for styled components. If using the object
+-- -- syntax, this isn't necessary (I think)
+-- -- To get autocompletion/LSP support in styled-components, follow the Visual Studio instructions
+-- -- here: https://github.com/styled-components/typescript-styled-plugin?tab=readme-ov-file#with-visual-studio
+-- -- and then run `TSInstall css` in the nvim command line to get syntax highlighting
+-- --
+-- -- I might be able to get this working w/o needing to install the plugin into the project and instead use a global
+-- -- config, but I haven't been able to get that to work yet, and it's not worth the time
 
-vim.lsp.buf.format {
-  filter = function(client)
-    return client.name ~= "yamlls" and client.name ~= "marksman" -- and client.name ~= "eslint_d"
-  end
-}
+-- -- @TODO: disabling this for now
+-- -- autocmd("BufWritePre", {
+-- --   pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+-- --   callback = function()
+-- --     -- this makes it so that if eslint isn't installed in a project, we don't get an error on every save
+-- --     if vim.fn.exists(':EslintFixAll') > 0 then
+-- --       vim.cmd("EslintFixAll")
+-- --     end
+-- --     if vim.fn.exists(':Prettier') > 0 then
+-- --       vim.cmd('Prettier')
+-- --     end
+-- --   end
+-- -- })
 
-lsp.on_attach(function(client, bufnr)
-  local opts = { buffer = bufnr, remap = false }
-  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
-  vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
-  vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
-  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+-- -- idk how to make this work, whatever
+-- -- autocmd("BufWritePre", {
+-- --   pattern = { '*.kt', '*.kts' },
+-- --   callback = function()
+-- --     vim.cmd("%! ktlint --format")
+-- --   end
+-- -- })
 
 
-  local supported_types = {
-    -- @TODO: make this a mapping for the ensure_installed so that I don't forget to add things
-    -- in two places
-    'javascriptreact',
-    'typescriptreact',
-    'typescript',
-    'javascript',
-    'lua',
-    'go',
-    'rust',
-    'python',
-    'kotlin',
-    'gleam',
-    'haskell',
-  }
+-- vim.lsp.buf.format {
+--   filter = function(client)
+--     return client.name ~= "yamlls" and client.name ~= "marksman" -- and client.name ~= "eslint_d"
+--   end
+-- }
 
-  autocmd("BufWritePre", {
-    callback = function()
-      local type = vim.bo.filetype
-      if vim.tbl_contains(supported_types, type) then
-        vim.lsp.buf.format()
-      end
-    end
-  })
-end)
+-- lsp.on_attach(function(client, bufnr)
+--   local opts = { buffer = bufnr, remap = false }
+--   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
+--   vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
+--   vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
+--   vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
+--   vim.keymap.set("n", "[d", function() vim.diagnostic.goto_next() end, opts)
+--   vim.keymap.set("n", "]d", function() vim.diagnostic.goto_prev() end, opts)
+--   vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+--   vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+--   vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+--   vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 
-require('mason').setup({})
-require('mason-lspconfig').setup({
-  ensure_installed = {
-    'ts_ls',
-    'rust_analyzer',
-    -- 'eslint_d',
-    -- 'pyright',
-    'gopls',
-    'jsonls',
-    'bashls',
-    'dockerls',
-    'cssls',
-    'marksman',
-    'lua_ls',
-    -- 'pylsp',
-    'kotlin_language_server',
-    -- 'sqlls',
-    'astro',
-    'tailwindcss',
-    'denols',
-    'hls',
-    'biome',
-    'graphql',
-    'yamlls',
-  },
-  handlers = {
-    lsp.default_setup,
-    lua_ls = lspconfig.lua_ls.setup {
-      settings = {
-        Lua = {
-          diagnostics = {
-            globals = { 'vim' }
-          }
-        }
-      }
-    },
-    -- pylsp with mypy seems to be working fine after restarting the terminal, so will continue using that
-    -- setup; if I get the freeze on save issue again, will try switching back
-    -- pylsp with mypy seems to struggle a bit on really large files
-    -- (eg. payments/models.py in PlushCare API is 1700 LOC), so might be worth switching back to see
-    -- the difference
-    -- if I want to use pyright, use the commented out setup function below
-    --    pyright = lspconfig.pyright.setup {
-    --      settings = {
-    --        python = {
-    --          analysis = {
-    --            typeCheckingMode = "strict",
-    --            autoSearchPaths = true,
-    --            useLibraryCodeForTypes = true,
-    --            diagnosticMode = "workspace",
-    --            stubPath = vim.fn.stdpath('data') .. '/stubs'
-    --          }
-    --        }
-    --      }
-    --    },
-    --  On my work computer, pylsp gets installed into ~/.local/share/nvim/mason/packages/python-lsp-server.
-    --  To install type stubs and pylsp plugins I need to activate the venv in that folder, and then install
-    --  them manually using pip in isolated mode, as otherwise I get AWS code artifact 401 errors.
-    --
-    --  ^ I'm leaving this here for future reference, but the problem was that my global pip config had been set to use
-    --  PlushCare's AWS code artifact, so I had to delete my pip config in ~/.config/pip/pip.conf and everything is
-    --  working fine now
-    --
-    --  Have to install mypy to get type checking with pylsp, instead of needing something like pyright.
-    pylsp = function()
-      lspconfig.pylsp.setup({
-        settings = {
-          pylsp = {
-            configurationSources = { "flake8" },
-            plugins = {
-              pycodestyle = {
-                enabled = false,
-              },
-              mccabe = {
-                enabled = false
-              },
-              pyflakes = {
-                enabled = false
-              },
-              pylint = {
-                enabled = false
-              },
-              flake8 = {
-                enabled = true,
-                --maxLineLength = 120,
-              },
-              autopep8 = {
-                enabled = true,
-              },
-              yapf = {
-                enabled = false,
-              },
-              isort = {
-                enabled = false,
-              },
-            }
-          },
-        }
-      })
-    end,
-    bashls = lspconfig.bashls.setup({
-      cmd = { "bash-language-server", "start" },
-      filetypes = { "sh", "zsh", "bash", ".bashrc" },
-      root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
-      settings = {
-        bash = {
-          filetypes = { "sh", "zsh", "bash" }
-        }
-      }
-    }),
-    yamlls = lspconfig.yamlls.setup({
-      filetypes = { "yaml", "yml" }
-    }),
-    kotlin_language_server = lspconfig.kotlin_language_server.setup({
-      cmd = { "kotlin-language-server" },
-      filetypes = { "kotlin" },
-    }),
-    tailwindcss = lspconfig.tailwindcss.setup {
-      filetypes = { "javascriptreact", "typescriptreact", "gleam", "html" }
-    },
-    -- eslint_d = lspconfig.eslint_d.setup {
-    --   -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
-    --   -- root_dir = function()
-    --   --   return vim.fs.dirname(vim.fs.find({ 'eslint.config.mjs' }, { upward = true })[1])
-    --   -- end,
-    --   useFlatConfig = true,
-    --   autoFixOnSave = false,
-    -- },
-    biome = function()
-      lspconfig.biome.setup {}
-    end,
-    gleam = lspconfig.gleam.setup {},
-    hls = lspconfig.hls.setup {
-      filetypes = { 'haskell', 'lhaskell', 'cabal' },
-    },
-    ts_ls = lspconfig.ts_ls.setup {
-      root_dir = lspconfig.util.root_pattern("tsconfig.json"),
-      single_file_support = false,
-      settings = {
-        typescript = {
-          tsserver = {
-            maxTsServerMemory = 24000,
-            nodePath = "node",
-          }
-        }
-      },
-    },
-    denols = lspconfig.denols.setup {
-      root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
-    },
-    graphql = lspconfig.graphql.setup {
-      -- root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json", "graphql.config.js"),
-      filetypes = {
-        "javascriptreact",
-        "typescriptreact",
-        "javascript",
-        "typescript",
-        "graphql"
-      }
-    },
-  }
-})
 
--- lspconfig.gleam.setup {}
+--   local supported_types = {
+--     -- @TODO: make this a mapping for the ensure_installed so that I don't forget to add things
+--     -- in two places
+--     'javascriptreact',
+--     'typescriptreact',
+--     'typescript',
+--     'javascript',
+--     'lua',
+--     'go',
+--     'rust',
+--     'python',
+--     'kotlin',
+--     'gleam',
+--     'haskell',
+--   }
 
-vim.diagnostic.config({
-  virtual_text = true
-})
+--   autocmd("BufWritePre", {
+--     callback = function()
+--       local type = vim.bo.filetype
+--       if vim.tbl_contains(supported_types, type) then
+--         vim.lsp.buf.format()
+--       end
+--     end
+--   })
+-- end)
 
-vim.env.ESLINT_D_PPID = vim.fn.getpid()
-local js_linters = { 'eslint_d', 'biomejs' }
-require('lint').linters_by_ft = {
-  javascript = js_linters,
-  typescript = js_linters,
-  javascriptreact = js_linters,
-  typescriptreact = js_linters,
-}
+-- require('mason').setup({})
+-- require('mason-lspconfig').setup({
+--   ensure_installed = {
+--     'ts_ls',
+--     'rust_analyzer',
+--     -- 'eslint_d',
+--     -- 'pyright',
+--     'gopls',
+--     'jsonls',
+--     'bashls',
+--     'dockerls',
+--     'cssls',
+--     'marksman',
+--     'lua_ls',
+--     -- 'pylsp',
+--     'kotlin_language_server',
+--     -- 'sqlls',
+--     'astro',
+--     'tailwindcss',
+--     'denols',
+--     'hls',
+--     'biome',
+--     'graphql',
+--     'yamlls',
+--   },
+--   handlers = {
+--     lsp.default_setup,
+--     lua_ls = lspconfig.lua_ls.setup {
+--       settings = {
+--         Lua = {
+--           diagnostics = {
+--             globals = { 'vim' }
+--           }
+--         }
+--       }
+--     },
+--     -- pylsp with mypy seems to be working fine after restarting the terminal, so will continue using that
+--     -- setup; if I get the freeze on save issue again, will try switching back
+--     -- pylsp with mypy seems to struggle a bit on really large files
+--     -- (eg. payments/models.py in PlushCare API is 1700 LOC), so might be worth switching back to see
+--     -- the difference
+--     -- if I want to use pyright, use the commented out setup function below
+--     --    pyright = lspconfig.pyright.setup {
+--     --      settings = {
+--     --        python = {
+--     --          analysis = {
+--     --            typeCheckingMode = "strict",
+--     --            autoSearchPaths = true,
+--     --            useLibraryCodeForTypes = true,
+--     --            diagnosticMode = "workspace",
+--     --            stubPath = vim.fn.stdpath('data') .. '/stubs'
+--     --          }
+--     --        }
+--     --      }
+--     --    },
+--     --  On my work computer, pylsp gets installed into ~/.local/share/nvim/mason/packages/python-lsp-server.
+--     --  To install type stubs and pylsp plugins I need to activate the venv in that folder, and then install
+--     --  them manually using pip in isolated mode, as otherwise I get AWS code artifact 401 errors.
+--     --
+--     --  ^ I'm leaving this here for future reference, but the problem was that my global pip config had been set to use
+--     --  PlushCare's AWS code artifact, so I had to delete my pip config in ~/.config/pip/pip.conf and everything is
+--     --  working fine now
+--     --
+--     --  Have to install mypy to get type checking with pylsp, instead of needing something like pyright.
+--     pylsp = function()
+--       lspconfig.pylsp.setup({
+--         settings = {
+--           pylsp = {
+--             configurationSources = { "flake8" },
+--             plugins = {
+--               pycodestyle = {
+--                 enabled = false,
+--               },
+--               mccabe = {
+--                 enabled = false
+--               },
+--               pyflakes = {
+--                 enabled = false
+--               },
+--               pylint = {
+--                 enabled = false
+--               },
+--               flake8 = {
+--                 enabled = true,
+--                 --maxLineLength = 120,
+--               },
+--               autopep8 = {
+--                 enabled = true,
+--               },
+--               yapf = {
+--                 enabled = false,
+--               },
+--               isort = {
+--                 enabled = false,
+--               },
+--             }
+--           },
+--         }
+--       })
+--     end,
+--     bashls = lspconfig.bashls.setup({
+--       cmd = { "bash-language-server", "start" },
+--       filetypes = { "sh", "zsh", "bash", ".bashrc" },
+--       root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+--       settings = {
+--         bash = {
+--           filetypes = { "sh", "zsh", "bash" }
+--         }
+--       }
+--     }),
+--     yamlls = lspconfig.yamlls.setup({
+--       filetypes = { "yaml", "yml" }
+--     }),
+--     kotlin_language_server = lspconfig.kotlin_language_server.setup({
+--       cmd = { "kotlin-language-server" },
+--       filetypes = { "kotlin" },
+--     }),
+--     tailwindcss = lspconfig.tailwindcss.setup {
+--       filetypes = { "javascriptreact", "typescriptreact", "gleam", "html" }
+--     },
+--     -- eslint_d = lspconfig.eslint_d.setup {
+--     --   -- root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+--     --   -- root_dir = function()
+--     --   --   return vim.fs.dirname(vim.fs.find({ 'eslint.config.mjs' }, { upward = true })[1])
+--     --   -- end,
+--     --   useFlatConfig = true,
+--     --   autoFixOnSave = false,
+--     -- },
+--     biome = function()
+--       lspconfig.biome.setup {}
+--     end,
+--     gleam = lspconfig.gleam.setup {},
+--     hls = lspconfig.hls.setup {
+--       filetypes = { 'haskell', 'lhaskell', 'cabal' },
+--     },
+--     ts_ls = lspconfig.ts_ls.setup {
+--       root_dir = lspconfig.util.root_pattern("tsconfig.json"),
+--       single_file_support = false,
+--       settings = {
+--         typescript = {
+--           tsserver = {
+--             maxTsServerMemory = 24000,
+--             nodePath = "node",
+--           }
+--         }
+--       },
+--     },
+--     denols = lspconfig.denols.setup {
+--       root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+--     },
+--     graphql = lspconfig.graphql.setup {
+--       -- root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json", "graphql.config.js"),
+--       filetypes = {
+--         "javascriptreact",
+--         "typescriptreact",
+--         "javascript",
+--         "typescript",
+--         "graphql"
+--       }
+--     },
+--   }
+-- })
 
-autocmd({ "BufWritePre" }, {
-  callback = function()
-    -- try_lint without arguments runs the linters defined in `linters_by_ft`
-    -- for the current filetype
-    require("lint").try_lint()
+-- -- lspconfig.gleam.setup {}
 
-    -- You can call `try_lint` with a linter name or a list of names to always
-    -- run specific linters, independent of the `linters_by_ft` configuration
-    require("lint").try_lint("cspell")
-  end,
-})
+-- vim.diagnostic.config({
+--   virtual_text = true
+-- })
+
+-- vim.env.ESLINT_D_PPID = vim.fn.getpid()
+-- local js_linters = { 'eslint_d', 'biomejs' }
+-- require('lint').linters_by_ft = {
+--   javascript = js_linters,
+--   typescript = js_linters,
+--   javascriptreact = js_linters,
+--   typescriptreact = js_linters,
+-- }
+
+-- autocmd({ "BufWritePre" }, {
+--   callback = function()
+--     -- try_lint without arguments runs the linters defined in `linters_by_ft`
+--     -- for the current filetype
+--     require("lint").try_lint()
+
+--     -- You can call `try_lint` with a linter name or a list of names to always
+--     -- run specific linters, independent of the `linters_by_ft` configuration
+--     require("lint").try_lint("cspell")
+--   end,
+-- })
