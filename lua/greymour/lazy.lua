@@ -179,6 +179,12 @@ local plugins = {
   },
   { 'mfussenegger/nvim-lint' },
   -- { 'mfussenegger/nvim-dap' }
+  {
+    'brexhq/kotlin-bazel.nvim',
+    ft = "kotlin",
+    opts = {},
+  },
+  -- { 'olimorris/codecompanion.nvim' },
 }
 
 require("lazy").setup(plugins)

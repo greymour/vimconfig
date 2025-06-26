@@ -152,7 +152,7 @@ vim.lsp.enable({
   'biome',
   'eslint',
   'gleam',
-  -- 'kotlin',
+  'kotlin',
 })
 
 vim.diagnostic.config {
