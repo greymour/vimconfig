@@ -329,3 +329,67 @@ vim.keymap.set("n", "<leader>cfm", function()
   })
   vim.cmd('normal! 4k')
 end)
+
+local function create_terminal_and_feedkeys(text, open_split_terminal, on_complete)
+  local terminal_buf_id = -1
+  local terminal_win_id = -1
+  local delay_ms = 50
+  vim.api.nvim_create_autocmd('TermOpen', {
+    -- can't do this as defining the autocmd with the buffer id of -1 throws an error
+    -- we shouldn't need it anyway since this is defined w/ the `once` param
+    -- buffer = terminal_buf_id, -- Restrict this autocommand to *this* specific buffer
+    once = true,
+    callback = function()
+      vim.defer_fn(function()
+        -- invalid state, wowie
+        if terminal_buf_id == -1 or terminal_win_id == -1 then
+          return
+        end
+        vim.api.nvim_set_current_win(terminal_win_id)
+
+        local job_id = vim.b[terminal_buf_id].terminal_job_id
+        if job_id then
+          vim.api.nvim_chan_send(job_id, text .. '\n')
+        else
+        end
+        if type(on_complete) == "function" then
+          on_complete()
+        end
+      end, delay_ms)
+    end,
+  })
+  open_split_terminal()
+  -- Get the buffer number and window ID of the newly created terminal.
+  -- These will be the current buffer and window immediately after `vim.cmd('terminal')`.
+  terminal_buf_id = vim.api.nvim_get_current_buf()
+  terminal_win_id = vim.api.nvim_get_current_win()
+end
+
+local function open_split_term()
+  vim.cmd("vsplit")
+  vim.cmd("terminal")
+end
+
+local function resize_split(winnr, size)
+  local s = type(size) ~= "nil" and size or 40
+  vim.api.nvim_set_current_win(winnr)
+  vim.cmd(string.format("wincmd %s|", s))
+end
+
+vim.keymap.set("n", "<leader>cc", function()
+  local original_win = vim.api.nvim_get_current_win()
+  local original_buf = vim.api.nvim_get_current_buf()
+  -- opens a split to the left, which I want to use for my terminal
+  open_split_term()
+  local term_win = vim.api.nvim_get_current_win()
+
+  create_terminal_and_feedkeys("claude", open_split_term, function()
+    local claude_win = vim.api.nvim_get_current_win()
+    -- move the claude window to the far right
+    vim.cmd("wincmd L")
+    resize_split(term_win)
+    resize_split(claude_win, 50)
+    vim.api.nvim_set_current_win(original_win)
+    vim.api.nvim_set_current_buf(original_buf)
+  end)
+end)
