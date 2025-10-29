@@ -86,8 +86,8 @@ end
 -- my_theme()
 setup_catppuccin()
 
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('my.lsp', {}),
+autocmd('LspAttach', {
+  group = augroup('my.lsp', {}),
   callback = function(args)
     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
     if client:supports_method('textDocument/implementation') then
@@ -111,14 +111,25 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.cmd [[set completeopt+=menuone,noselect,popup]]
       -- remap it so that it uses Enter to select something instead of ctrl+Y
       vim.cmd [[inoremap <expr> <cr> pumvisible() ? '<c-y>' : '<cr>']]
-      local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
-      client.server_capabilities.completionProvider.triggerCharacters = chars
+      -- Only trigger on essential characters for TS/JS (optimized for performance)
+      local trigger_chars = {'.', '"', "'", '/', '@', '<', '(', '[', '{', ':'}
+      if client.server_capabilities.completionProvider then
+        client.server_capabilities.completionProvider.triggerCharacters = trigger_chars
+      end
       vim.lsp.completion.enable(true, client.id, args.buf, {
         autotrigger = true,
-        -- do I really know what this does? no!
-        -- convert = function(item)
-        --   return { abbr = item.label:gsub('%b()', '') }
-        -- end,
+        -- Clean up completion items to remove unwanted characters like '..' or '?.?'
+        convert = function(item)
+          -- Clean up the item label to avoid unwanted characters
+          local label = item.label
+          -- Remove optional chaining patterns (?.)
+          label = label:gsub('?%.?', '')
+          -- Remove double dots (..)
+          label = label:gsub('%.%.', '.')
+          -- Remove parentheses content
+          label = label:gsub('%b()', '')
+          return { abbr = label }
+        end,
       })
     end
 
@@ -126,31 +137,23 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
     if not client:supports_method('textDocument/willSaveWaitUntil')
         and client:supports_method('textDocument/formatting') then
-      vim.api.nvim_create_autocmd('BufWritePre', {
-        group = vim.api.nvim_create_augroup('my.lsp', { clear = false }),
+      autocmd('BufWritePre', {
+        group = augroup('my.lsp', { clear = false }),
         buffer = args.buf,
         callback = function()
           vim.lsp.buf.format({ bufnr = args.buf, id = client.id, timeout_ms = 1000 })
         end,
       })
     end
-    -- vim.env.ESLINT_D_PPID = vim.fn.getpid()
-    -- local js_linters = { 'eslint_d', 'biomejs' }
-    -- require('lint').linters_by_ft = {
-    --   javascript = js_linters,
-    --   typescript = js_linters,
-    --   javascriptreact = js_linters,
-    --   typescriptreact = js_linters,
-    -- }
   end,
 })
 -- enable LSPs
 vim.lsp.enable({
   'lua',
+  'biome',
   'ts_ls',
   'graphql',
-  'biome',
-  'eslint',
+  -- 'eslint',
   'gleam',
   'kotlin',
 })
@@ -166,5 +169,7 @@ vim.diagnostic.config {
   },
   virtual_text = {
     current_line = false
-  }
+  },
+  -- Performance optimizations for large projects
+  severity_sort = true,  -- Sort by severity for faster rendering
 }

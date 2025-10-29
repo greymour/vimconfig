@@ -35,7 +35,7 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 50
+vim.opt.updatetime = 200  -- Optimized for large TS projects (was 50ms)
 
 vim.opt.colorcolumn = "120"
 --vim.opt.iskeyword = "_"

@@ -188,3 +188,5 @@ local plugins = {
 }
 
 require("lazy").setup(plugins)
+-- vim.opt.rtp:append('/Users/kurt/code/kotlin-bazel.nvim') -- Use path where you cloned the plugin.
+-- require('kotlin_bazel').setup()
