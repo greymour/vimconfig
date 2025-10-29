@@ -215,8 +215,7 @@ end)
 vim.keymap.set("n", "<leader>cf", "<cmd>let @+ = expand(\"%:t\")<CR>")
 -- copies the current file path relative to the project root to the system clipboard
 -- eg in ~/.config/nvim/lua/greymour/remap.lua, it would copy lua/greymour/remap.lua
--- -- @TODO: sometimes this copies the path all the way from the user root which is annoying as hell, no idea why :D
-vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand(\"%\")<CR>")
+vim.keymap.set("n", "<leader>cp", "<cmd>let @+ = expand(\"%:.\")<CR>")
 
 vim.keymap.set("i", "<C-BS>", "<C-w>")
 
