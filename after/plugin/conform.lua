@@ -1,16 +1,16 @@
 require("conform").setup({
   formatters_by_ft = {
-    javascript = { "prettier" },
-    javascriptreact = { "prettier" },
-    typescript = { "prettier" },
-    typescriptreact = { "prettier" },
-    json = { "prettier" },
-    jsonc = { "prettier" },
-    css = { "prettier" },
-    html = { "prettier" },
-    markdown = { "prettier" },
-    yaml = { "prettier" },
-    astro = { "prettier" },
+    javascript = { "prettier", "biome", "biome-organize-imports" },
+    javascriptreact = { "prettier", "biome", "biome-organize-imports" },
+    typescript = { "prettier", "biome", "biome-organize-imports" },
+    typescriptreact = { "prettier", "biome", "biome-organize-imports" },
+    json = { "prettier", "biome", "biome-organize-imports" },
+    jsonc = { "prettier", "biome", "biome-organize-imports" },
+    css = { "prettier", "biome", "biome-organize-imports" },
+    html = { "prettier", "biome", "biome-organize-imports" },
+    markdown = { "prettier", "biome", "biome-organize-imports" },
+    yaml = { "prettier", "biome", "biome-organize-imports" },
+    astro = { "prettier", "biome", "biome-organize-imports" },
   },
   formatters = {
     prettier = {
@@ -31,6 +31,9 @@ require("conform").setup({
         "package.json",
       }),
     },
+    biome = {
+      "biome.json",
+    }
   },
   -- Format on save
   format_on_save = {
