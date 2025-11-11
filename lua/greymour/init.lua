@@ -156,6 +156,9 @@ vim.lsp.enable({
   -- 'eslint',
   'gleam',
   'kotlin',
+  'astro',
+  'tailwindcss',
+  'prettier',
 })
 
 vim.diagnostic.config {
