@@ -180,6 +180,12 @@ local plugins = {
   { 'mfussenegger/nvim-lint' },
   -- { 'mfussenegger/nvim-dap' }
   -- { 'olimorris/codecompanion.nvim' },
+  {
+    'stevearc/conform.nvim',
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    opts = {},
+  },
 }
 
 require("lazy").setup(plugins)

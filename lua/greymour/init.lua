@@ -158,7 +158,6 @@ vim.lsp.enable({
   'kotlin',
   'astro',
   'tailwindcss',
-  'prettier',
 })
 
 vim.diagnostic.config {
