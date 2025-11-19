@@ -112,7 +112,7 @@ autocmd('LspAttach', {
       -- remap it so that it uses Enter to select something instead of ctrl+Y
       vim.cmd [[inoremap <expr> <cr> pumvisible() ? '<c-y>' : '<cr>']]
       -- Only trigger on essential characters for TS/JS (optimized for performance)
-      local trigger_chars = {'.', '"', "'", '/', '@', '<', '(', '[', '{', ':'}
+      local trigger_chars = { '.', '"', "'", '/', '@', '<', '(', '[', '{', ':' }
       if client.server_capabilities.completionProvider then
         client.server_capabilities.completionProvider.triggerCharacters = trigger_chars
       end
@@ -147,18 +147,52 @@ autocmd('LspAttach', {
     end
   end,
 })
--- enable LSPs
-vim.lsp.enable({
-  'lua',
-  'biome',
-  'ts_ls',
-  'graphql',
-  -- 'eslint',
-  'gleam',
-  'kotlin',
-  'astro',
-  'tailwindcss',
-})
+local function parse_env_file(filepath)
+  local env = {}
+  local file = io.open(filepath, "r")
+  if not file then
+    return env
+  end
+
+  for line in file:lines() do
+    local trimmed = Trim(line)
+    if trimmed ~= "" and not trimmed:match("^#") then
+      local key, value = trimmed:match("^([^=]+)=(.*)$")
+      if key and value then
+        key = Trim(key)
+        value = Trim(value)
+        value = value:gsub("^['\"](.+)['\"]$", "%1")
+        env[key] = value
+      end
+    end
+  end
+  file:close()
+  return env
+end
+
+local function get_enabled_lsps()
+  local config_dir = vim.fn.stdpath("config")
+  local env_file = config_dir .. "/.env"
+  local env = parse_env_file(env_file)
+
+  local default_lsps = {
+    'lua',
+    'ts_ls',
+  }
+
+  if not env.LSP_ENABLED then
+    return default_lsps
+  end
+
+  local enabled_lsps = {}
+  for lsp in env.LSP_ENABLED:gmatch("[^,]+") do
+    table.insert(enabled_lsps, Trim(lsp))
+  end
+
+  return enabled_lsps
+end
+
+vim.lsp.enable(get_enabled_lsps())
 
 vim.diagnostic.config {
   signs = {
@@ -173,5 +207,5 @@ vim.diagnostic.config {
     current_line = false
   },
   -- Performance optimizations for large projects
-  severity_sort = true,  -- Sort by severity for faster rendering
+  severity_sort = true, -- Sort by severity for faster rendering
 }
