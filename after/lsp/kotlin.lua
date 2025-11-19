@@ -13,7 +13,25 @@ return {
   root_markers = root_files,
   cmd = { 'kotlin-language-server' },
   init_options = {
-    -- Enables caching and use project root to store cache data.
     storagePath = vim.fs.root(vim.fn.expand '%:p:h', root_files),
+  },
+  settings = {
+    kotlin = {
+      compiler = {
+        jvm = {
+          target = '17',
+        },
+      },
+      formatting = {
+        enabled = true,
+      },
+      linting = {
+        enabled = true,
+      },
+      externalSources = {
+        useKtlint = true,
+        autoFormat = true,
+      },
+    },
   },
 }
