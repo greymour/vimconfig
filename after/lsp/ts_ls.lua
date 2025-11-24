@@ -7,7 +7,8 @@ return {
   settings = {
     typescript = {
       tsserver = {
-        maxTsServerMemory = 32000,
+        -- 32gb
+        maxTsServerMemory = 32768,
         -- maxTsServerMemory = 8192, -- default to 8gb of memory
         nodePath = "node",
         logLevel = "off",
@@ -39,15 +40,15 @@ return {
         },
       },
       -- PERFORMANCE OPTIMIZATIONS for large projects
-      disableAutomaticTypingAcquisition = true,  -- Stop auto-downloading @types packages
+      disableAutomaticTypingAcquisition = true, -- Stop auto-downloading @types packages
       -- Preferences for faster operations
       preferences = {
         includeCompletionsForModuleExports = true,
         includeCompletionsWithInsertText = true,
         -- Faster import suggestions (less complete but quicker)
         includeCompletionsForImportStatements = true,
-        includeAutomaticOptionalChainCompletions = false,  -- Reduce noise
-        includeCompletionsWithSnippetText = false,         -- Faster completions
+        includeAutomaticOptionalChainCompletions = false, -- Reduce noise
+        includeCompletionsWithSnippetText = false,        -- Faster completions
         -- Speed up signature help
         providePrefixAndSuffixTextForRename = false,
       },
@@ -56,7 +57,7 @@ return {
       referencesCodeLens = { enabled = false },
       -- Format settings
       format = {
-        enable = false,  -- We use Biome for formatting
+        enable = false, -- We use Biome for formatting
       },
     },
     javascript = {
