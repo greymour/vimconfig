@@ -11,6 +11,7 @@ require("conform").setup({
     markdown = { "prettier", "biome", "biome-organize-imports" },
     yaml = { "prettier", "biome", "biome-organize-imports" },
     astro = { "prettier", "biome", "biome-organize-imports" },
+    kotlin = { "ktlint" },
   },
   formatters = {
     prettier = {
@@ -33,7 +34,12 @@ require("conform").setup({
     },
     biome = {
       "biome.json",
-    }
+    },
+    ktlint = {
+      command = "ktlint",
+      args = { "-F", "$FILENAME" },
+      stdin = false,
+    },
   },
   -- Format on save
   format_on_save = {

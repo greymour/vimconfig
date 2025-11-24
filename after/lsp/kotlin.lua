@@ -22,16 +22,13 @@ return {
           target = '17',
         },
       },
-      formatting = {
-        enabled = true,
-      },
-      linting = {
-        enabled = true,
-      },
       externalSources = {
-        useKtlint = true,
-        autoFormat = true,
+        useKtlint = false,
       },
     },
   },
+  on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
 }
