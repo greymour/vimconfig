@@ -132,6 +132,7 @@ autocmd('LspAttach', {
     end
   end,
 })
+
 local function parse_env_file(filepath)
   local env = {}
   local file = io.open(filepath, "r")

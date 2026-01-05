@@ -48,9 +48,8 @@ return {
     'astro',
   },
   workspace_required = true,
-  on_attach = function(client)
-    local bufnr = vim.api.nvim_get_current_buf()
-    vim.api.nvim_buf_create_user_command(0, 'LspEslintFixAll', function()
+  on_attach = function(client, bufnr)
+    vim.api.nvim_buf_create_user_command(bufnr, 'LspEslintFixAll', function()
       client:exec_cmd({
         title = 'Fix all Eslint errors for current buffer',
         command = 'eslint.applyAllFixes',
