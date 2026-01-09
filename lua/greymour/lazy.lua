@@ -186,6 +186,13 @@ local plugins = {
     cmd = { "ConformInfo" },
     opts = {},
   },
+  {
+    dir = "~/code/tree-sitter-groq",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("tree-sitter-groq").setup()
+    end,
+  }
 }
 
 require("lazy").setup(plugins)
