@@ -1,3 +1,8 @@
+local biome_root_file = require("conform.util").root_file({
+  "biome.json",
+  "biome.jsonc",
+})
+
 require("conform").setup({
   formatters_by_ft = {
     javascript = { "prettier", "biome", "biome-organize-imports" },
@@ -15,7 +20,6 @@ require("conform").setup({
   },
   formatters = {
     prettier = {
-      -- Specify all config files prettier looks for
       require_cwd = true,
       cwd = require("conform.util").root_file({
         ".prettierrc",
@@ -33,7 +37,12 @@ require("conform").setup({
       }),
     },
     biome = {
-      "biome.json",
+      require_cwd = true,
+      cwd = biome_root_file,
+    },
+    ["biome-organize-imports"] = {
+      require_cwd = true,
+      cwd = biome_root_file,
     },
     ktlint = {
       command = "ktlint",
@@ -41,9 +50,7 @@ require("conform").setup({
       stdin = false,
     },
   },
-  -- Format on save
   format_on_save = {
-    -- These options will be passed to conform.format()
     timeout_ms = 500,
     lsp_fallback = true,
   },
