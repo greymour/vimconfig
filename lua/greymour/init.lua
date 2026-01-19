@@ -22,7 +22,7 @@ autocmd('TextYankPost', {
   end,
 })
 
--- I forget what this does
+-- this strips trailing whitespace from all lines before saving a file
 autocmd({ "BufWritePre" }, {
   group = GreymourGroup,
   pattern = "*",
@@ -32,19 +32,6 @@ autocmd({ "BufWritePre" }, {
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
-
-local function setup_material()
-  vim.g.material_style = "palenight"
-  vim.cmd 'colorscheme material'
-  -- sets all line numbers to white with a blue-purple background, need this to make set the current line number's
-  -- colour when editing a file
-  vim.cmd ':hi LineNr guibg=#7253c6 guifg=#ffffff'
-  -- this changes the line number colour in netrw
-  vim.cmd ':hi CursorLineNr guibg=#7253c6 guifg=#ffffff'
-  -- overrides the LineNr setting for lines above and below the current line to an off-white
-  vim.cmd ':hi LineNrAbove guibg=none guifg=#8c8c8c'
-  vim.cmd ':hi LineNrBelow guibg=none guifg=#8c8c8c'
-end
 
 local function setup_catppuccin()
   vim.cmd.colorscheme "catppuccin-mocha"
