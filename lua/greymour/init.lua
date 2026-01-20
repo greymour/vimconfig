@@ -105,17 +105,15 @@ autocmd('LspAttach', {
       end
       vim.lsp.completion.enable(true, client.id, args.buf, {
         autotrigger = true,
-        -- Clean up completion items to remove unwanted characters like '..' or '?.?'
         convert = function(item)
-          -- Clean up the item label to avoid unwanted characters
-          local label = item.label
-          -- Remove optional chaining patterns (?.)
-          label = label:gsub('?%.?', '')
-          -- Remove double dots (..)
-          label = label:gsub('%.%.', '.')
-          -- Remove parentheses content
-          label = label:gsub('%b()', '')
-          return { abbr = label }
+          local insert_text = item.insertText or item.label
+          -- Strip leading trigger characters that cause duplication
+          insert_text = insert_text:gsub('^%?%.', '')
+          insert_text = insert_text:gsub('^%.', '')
+
+          local display = item.label:gsub('%b()', '')
+
+          return { word = insert_text, abbr = display }
         end,
       })
     end
