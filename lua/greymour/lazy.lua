@@ -192,7 +192,7 @@ local plugins = {
     config = function()
       require("tree-sitter-groq").setup()
     end,
-  }
+  },
 }
 
 require("lazy").setup(plugins)
