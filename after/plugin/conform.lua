@@ -13,7 +13,6 @@ require("conform").setup({
     jsonc = { "prettier", "biome", "biome-organize-imports" },
     css = { "prettier", "biome", "biome-organize-imports" },
     html = { "prettier", "biome", "biome-organize-imports" },
-    markdown = { "prettier", "biome", "biome-organize-imports" },
     yaml = { "prettier", "biome", "biome-organize-imports" },
     astro = { "prettier", "biome", "biome-organize-imports" },
     kotlin = { "ktlint" },
