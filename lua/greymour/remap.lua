@@ -52,98 +52,8 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
 
-local dbl_slash = '//'
-local hash = '#'
--- calling this dash_dash because having dbl_slash and dbl_dash was confusing
-local dash_dash = '--'
-
-local comment_table = {
-  javascriptreact = dbl_slash,
-  typescriptreact = dbl_slash,
-  typescript = dbl_slash,
-  javascript = dbl_slash,
-  lua = dash_dash,
-  go = dbl_slash,
-  rust = dbl_slash,
-  python = hash,
-  bash = hash,
-  sh = hash,
-  zsh = hash,
-  dockerfile = hash,
-  toml = hash,
-  mk = hash,
-  makefile = hash,
-  make = hash,
-  yaml = hash,
-  css = '/* */',
-  gleam = dbl_slash,
-  haskell = dash_dash,
-  kotlin = dbl_slash,
-}
-
-
-local function trim(s)
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
--- insert the comment character for the current file type at the start of each line in the range from the start to the
--- end of the visual selection
-vim.keymap.set({ 'v', 'n' }, '<leader>/', function()
-  local file_type = vim.bo.filetype
-  if type(comment_table[file_type]) ~= "string" then
-    print("no log for this filetype: ", file_type)
-    return
-  end
-  local comment = comment_table[file_type]
-  local comment_len = string.len(comment)
-  if comment_len < 1 then
-    print("no comment character for this filetype: ", file_type)
-    return
-  end
-  -- vim.fn.getpos() only works for the start and end of the PREVIOUS visual selection, so doing this exits visual mode
-  vim.cmd("normal! v")
-  -- see :h getpos for what the values here are
-  local start_line = vim.fn.getpos("'<")[2]
-  local start_col = vim.fn.indent(start_line)
-  local end_line = vim.fn.getpos("'>")[2]
-  local line_str = vim.fn.getline(start_line)
-  -- the start and end of the selection don't care about whether the highlighting is from top to bottom or bottom to top
-  -- so we need to move the cursor to the bottom (or top) of the selection to force the direction to be consistent
-  vim.api.nvim_win_set_cursor(0, { start_line, 0 })
-  local step_cmd = "j"
-  local end_step = "k"
-
-  -- special handling for Golang. I could make some kind of "get_starting_column" function that abstracts this but
-  -- go is the only language that I've had this issue with so far
-  local is_go = file_type == 'go'
-  if is_go and start_col > 0 then
-    start_col = start_col - 1
-  end
-
-  local adding_comments = string.sub(string.gsub(line_str, "%s+", ""), 1, comment_len) ~= comment
-  if adding_comments then
-    vim.cmd("normal! ^")
-    for cur_line = start_line, end_line do
-      if trim(vim.fn.getline(cur_line)) == "" then
-        vim.cmd("normal! " .. step_cmd)
-      else
-        vim.api.nvim_win_set_cursor(0, { cur_line, start_col })
-        vim.cmd("normal! i" .. comment .. ' ')
-        vim.cmd("stopinsert")
-        vim.cmd("normal! " .. step_cmd)
-      end
-    end
-  else
-    for cur_line = start_line, end_line do
-      if trim(vim.fn.getline(cur_line)):sub(1, comment_len) ~= comment then
-        vim.cmd("normal! " .. step_cmd)
-      else
-        vim.cmd("normal! ^" .. comment_len + 1 .. "x")
-        vim.cmd("normal! " .. step_cmd)
-      end
-    end
-  end
-  vim.cmd("normal! " .. end_step)
-end, {})
+vim.keymap.set('n', '<leader>/', 'gcc', { remap = true })
+vim.keymap.set('v', '<leader>/', 'gc', { remap = true })
 
 -- table: {
 --   error_handler string,
@@ -189,26 +99,23 @@ end)
 -- @TODO: create a function line_has_content that checks if a line has any text in it, so that then I can use that to
 -- decide whether or not to use eg. o to insert a newline or i/a to insert text in the current line
 vim.keymap.set("n", "<leader>td", function()
-  local file_type = vim.bo.filetype
-  local comment_str = comment_table[file_type]
-  if type(comment_str) ~= "string" then
-    print("no comment character for this filetype: ", file_type)
+  local cs = vim.bo.commentstring
+  if cs == "" then
+    print("no commentstring for this filetype: ", vim.bo.filetype)
     return
   end
-  vim.cmd("normal! o" .. comment_str .. " @TODO: ")
-  vim.cmd("normal! la")
+  vim.cmd("normal! o" .. cs:format("@TODO: "))
+  vim.cmd("startinsert!")
 end)
 
 vim.keymap.set("n", "<leader>ic", function()
-  local filetype = vim.bo.filetype
-  local log_cmd = comment_table[filetype]
-  if type(log_cmd) ~= 'string' then
-    print("no log for this filetype: ", filetype)
+  local cs = vim.bo.commentstring
+  if cs == "" then
+    print("no commentstring for this filetype: ", vim.bo.filetype)
     return
   end
-  vim.cmd(string.format('normal! o%s  ', log_cmd))
-  vim.cmd("normal! $")
-  vim.cmd("startinsert")
+  vim.cmd("normal! o" .. cs:format(""))
+  vim.cmd("startinsert!")
 end)
 
 -- copies the current filename to system clipboard
