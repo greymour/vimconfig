@@ -18,9 +18,6 @@ autocmd("BufEnter", {
   command = "setlocal wrap linebreak"
 })
 
--- @TODO: get rid of this shit
--- local HOME = os.getenv("HOME") and os.getenv("HOME") or os.getenv("LOCALAPPDATA")
-
 vim.opt.swapfile = false
 vim.opt.backup = false
 -- vim.opt.undodir = HOME .. "/.vim/undodir"
@@ -35,7 +32,10 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
-vim.opt.updatetime = 200  -- Optimized for large TS projects (was 50ms)
+vim.opt.updatetime = 200 -- Optimized for large TS projects (was 50ms)
 
 vim.opt.colorcolumn = "120"
 --vim.opt.iskeyword = "_"
+-- case-insensitive search unless there's a capital letter in the search term
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
