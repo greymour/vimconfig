@@ -72,29 +72,37 @@ local oxfmt_filetypes = {
   yaml = true,
 }
 
-local function has_root(root, bufnr)
+local function find_root(root, bufnr)
   local filename = vim.api.nvim_buf_get_name(bufnr)
   local dirname = filename ~= "" and vim.fs.dirname(filename) or nil
 
-  return dirname and root(dirname) ~= nil
+  return dirname and root(dirname) or nil
 end
 
+-- In this monorepo different packages use different formatters (e.g. a root
+-- .prettierrc but typescript/growth has its own biome.jsonc). Order-based
+-- precedence would let the root prettier config shadow a subpackage's biome
+-- config, so instead pick whichever config is *closest* to the buffer. Deeper
+-- (longer) root path == nearer the file.
 local function web_formatters(bufnr)
   local filetype = vim.bo[bufnr].filetype
 
-  if oxfmt_filetypes[filetype] and has_root(oxfmt_root_file, bufnr) then
-    return { "oxfmt" }
+  local candidates = {
+    { formatters = { "oxfmt" }, root = find_root(oxfmt_root_file, bufnr), gated = not oxfmt_filetypes[filetype] },
+    { formatters = { "prettier" }, root = find_root(prettier_root_file, bufnr) },
+    { formatters = { "biome", "biome-organize-imports" }, root = find_root(biome_root_file, bufnr) },
+  }
+
+  local best
+  for _, c in ipairs(candidates) do
+    if c.root and not c.gated then
+      if not best or #c.root > #best.root then
+        best = c
+      end
+    end
   end
 
-  if has_root(prettier_root_file, bufnr) then
-    return { "prettier" }
-  end
-
-  if has_root(biome_root_file, bufnr) then
-    return { "biome", "biome-organize-imports" }
-  end
-
-  return {}
+  return best and best.formatters or {}
 end
 
 require("conform").setup({

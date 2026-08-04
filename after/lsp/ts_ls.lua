@@ -2,7 +2,17 @@
 return {
   init_options = { hostInfo = 'neovim' },
   cmd = { 'typescript-language-server', '--stdio' },
-  root_markers = { "tsconfig.json" },
+  -- Anchor at the nearest package boundary so tsserver loads that package's
+  -- local TypeScript. This monorepo pins different TS versions per package
+  -- (e.g. root is 4.1, typescript/growth is 5.8), and tsserver resolves
+  -- node_modules/typescript relative to root_dir. Falls back to the pnpm
+  -- lockfile / .git root when no package boundary is found.
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local root = vim.fs.root(fname, { "tsconfig.json", "package.json" })
+      or vim.fs.root(fname, { "pnpm-lock.yaml", ".git" })
+    on_dir(root)
+  end,
   single_file_support = false,
   settings = {
     typescript = {
